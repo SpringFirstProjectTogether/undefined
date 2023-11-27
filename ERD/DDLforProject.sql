@@ -40,6 +40,9 @@ DROP TABLE IF EXISTS study_posts;
 DROP TABLE IF EXISTS user_port_url;
 DROP TABLE IF EXISTS urltype;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS pg_files;
+DROP TABLE IF EXISTS pr_files;
+DROP TABLE IF EXISTS project_files;
 
 
 
@@ -51,8 +54,8 @@ CREATE TABLE feeds
 	feed_id int NOT NULL AUTO_INCREMENT,
 	feed_title varchar(200) NOT NULL,
 	feed_content text NOT NULL,
-	feed_state varchar(100) NOT NULL feed_state IN ('comp', 'temp', 'del'),
-	feed_regdate date DEFAULT NOW(), SYSDATE(),
+	feed_state varchar(100) NOT NULL check ( feed_state IN ('comp', 'temp', 'del')),
+	feed_regdate datetime DEFAULT NOW(),
 	feed_likeCnt int DEFAULT 0,
 	PRIMARY KEY (feed_id)
 );
@@ -65,7 +68,7 @@ CREATE TABLE feed_comments
 	user_id int NOT NULL,
 	parent_id int,
 	content varchar(1000) NOT NULL,
-	regdate date DEFAULT NOW(), SYSDATE(),
+	regdate datetime DEFAULT NOW(),
 	PRIMARY KEY (comment_id)
 );
 
@@ -99,13 +102,13 @@ CREATE TABLE feed_tags
 
 CREATE TABLE info_careerdetails
 (
+    career_id int NOT NULL AUTO_INCREMENT,
 	user_id int NOT NULL,
 	job_id int NOT NULL,
-	career_id int NOT NULL AUTO_INCREMENT,
 	company_name varchar(100) NOT NULL,
-	working_start date NOT NULL,
-	working_end date DEFAULT NOW(), SYSDATE(),
-	PRIMARY KEY (user_id, job_id, career_id)
+	working_start datetime NOT NULL,
+	working_end datetime DEFAULT NOW(),
+	PRIMARY KEY (career_id,user_id, job_id)
 );
 
 
@@ -127,8 +130,8 @@ CREATE TABLE info_jobs
 	required text NOT NULL,
 	job_location varchar(300) NOT NULL,
 	job_title varchar(300) NOT NULL,
-	job_startdate date DEFAULT NOW(), SYSDATE(),
-	job_enddate date,
+	job_startdate datetime DEFAULT NOW(),
+	job_enddate datetime,
 	PRIMARY KEY (job_id)
 );
 
@@ -140,11 +143,11 @@ CREATE TABLE info_resume
 	resume_title varchar(200) NOT NULL,
 	resume_content text NOT NULL,
 	graduate_school varchar(100) NOT NULL,
-	graduate_year date NOT NULL,
+	graduate_year datetime NOT NULL,
 	career int DEFAULT 0 NOT NULL,
-	applydate date DEFAULT NOW(), SYSDATE() NOT NULL,
-	update_date date DEFAULT NOW(), SYSDATE(),
-	isWritten bit(1) DEFAULT '0' NOT NULL,
+	applydate datetime DEFAULT NOW() NOT NULL,
+	update_date datetime DEFAULT NOW(),
+	isWritten bit(1) DEFAULT 0 NOT NULL,
 	PRIMARY KEY (user_id, job_id)
 );
 
@@ -181,7 +184,7 @@ CREATE TABLE pg_comments
 	pg_id int NOT NULL,
 	user_id int NOT NULL,
 	pg_c_comment text NOT NULL,
-	pg_c_regdate date DEFAULT NOW(), SYSDATE(),
+	pg_c_regdate datetime DEFAULT NOW(),
 	PRIMARY KEY (pg_c_id)
 );
 
@@ -242,10 +245,10 @@ CREATE TABLE project_gallery
 	user_id int NOT NULL,
 	pg_title varchar(200) NOT NULL,
 	pg_content text NOT NULL,
-	pg_startdate date NOT NULL,
+	pg_startdate datetime NOT NULL,
 	pg_duration int NOT NULL,
 	viewCnt int DEFAULT 0 NOT NULL,
-	pg_regdate date DEFAULT NOW(), SYSDATE(),
+	pg_regdate datetime DEFAULT NOW(),
 	likeCnt int DEFAULT 0 NOT NULL,
 	PRIMARY KEY (pg_id)
 );
@@ -256,7 +259,7 @@ CREATE TABLE project_recruits
 	pr_id int NOT NULL AUTO_INCREMENT,
 	pr_title varchar(200) NOT NULL,
 	pr_content text NOT NULL,
-	pr_method varchar(100) NOT NULL pr_method IN ('온라인', '오프라인', '온오프라인'),
+	pr_method varchar(100) NOT NULL check (pr_method IN ('온라인', '오프라인', '온오프라인')),
 	pr_predict int NOT NULL,
 	viewCnt int DEFAULT 0,
 	likeCnt int DEFAULT 0,
@@ -270,7 +273,7 @@ CREATE TABLE pr_comments
 	pr_id int NOT NULL,
 	user_id int NOT NULL,
 	pr_c_comment text NOT NULL,
-	pr_c_regdate date DEFAULT NOW(), SYSDATE() NOT NULL,
+	pr_c_regdate datetime DEFAULT NOW() NOT NULL,
 	PRIMARY KEY (pr_c_id)
 );
 
@@ -313,8 +316,8 @@ CREATE TABLE qna_comments
 	user_id int NOT NULL,
 	post_id int NOT NULL,
 	comment text NOT NULL,
-	comment_regdate date DEFAULT NOW(), SYSDATE(),
-	comment_modidate date DEFAULT NOW(), SYSDATE(),
+	comment_regdate datetime DEFAULT NOW(),
+	comment_modidate datetime DEFAULT NOW(),
 	PRIMARY KEY (comment_id)
 );
 
@@ -333,8 +336,8 @@ CREATE TABLE qna_posts
 	user_id int NOT NULL,
 	post_title varchar(300) NOT NULL,
 	post_content text NOT NULL,
-	post_modidate date DEFAULT NOW(), SYSDATE(),
-	post_regdate date DEFAULT NOW(), SYSDATE(),
+	post_modidate datetime DEFAULT NOW(),
+	post_regdate datetime DEFAULT NOW(),
 	PRIMARY KEY (post_id)
 );
 
@@ -355,7 +358,7 @@ CREATE TABLE study_comments
 	user_id int NOT NULL,
 	post_id int NOT NULL,
 	comment text NOT NULL,
-	comment_regdate date DEFAULT NOW(), SYSDATE(),
+	comment_regdate datetime DEFAULT NOW(),
 	PRIMARY KEY (comment_id)
 );
 
@@ -383,8 +386,8 @@ CREATE TABLE study_posts
 	post_title varchar(200) NOT NULL,
 	post_content text NOT NULL,
 	post_veiwCnt int DEFAULT 0,
-	post_regdate date DEFAULT NOW(), SYSDATE(),
-	post_enddate date NOT NULL,
+	post_regdate datetime DEFAULT NOW(),
+	post_enddate datetime NOT NULL,
 	post_member int NOT NULL,
 	PRIMARY KEY (post_id)
 );
@@ -415,7 +418,7 @@ CREATE TABLE users
 	email varchar(200) NOT NULL,
 	tel varchar(30) NOT NULL,
 	address varchar(300) NOT NULL,
-	isCompany bit(1) DEFAULT '0' NOT NULL,
+	isCompany bit(1) DEFAULT 0 NOT NULL,
 	PRIMARY KEY (user_id),
 	UNIQUE (user_login_id)
 );
@@ -429,9 +432,60 @@ CREATE TABLE user_port_url
 	PRIMARY KEY (user_id, type_id)
 );
 
+CREATE TABLE project_files
+(
+    file_id int NOT NULL AUTO_INCREMENT,
+    file_url varchar(1000) NOT NULL,
+    PRIMARY KEY (file_id)
+);
+
+CREATE TABLE pr_files
+(
+    pr_id int NOT NULL,
+    file_id int NOT NULL,
+    PRIMARY KEY (pr_id, file_id)
+);
+
+CREATE TABLE pg_files
+(
+    pg_id int NOT NULL,
+    file_id int NOT NULL,
+    PRIMARY KEY (pg_id, file_id)
+);
+
+
 
 
 /* Create Foreign Keys */
+
+ALTER TABLE pg_files
+    ADD FOREIGN KEY (file_id)
+        REFERENCES project_files (file_id)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+;
+
+ALTER TABLE pg_files
+    ADD FOREIGN KEY (pg_id)
+        REFERENCES project_gallery (pg_id)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+;
+
+ALTER TABLE pr_files
+    ADD FOREIGN KEY (file_id)
+        REFERENCES project_files (file_id)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+;
+
+ALTER TABLE pr_files
+    ADD FOREIGN KEY (pr_id)
+        REFERENCES project_recruits (pr_id)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+;
+
 
 ALTER TABLE feed_comments
 	ADD FOREIGN KEY (feed_id)
