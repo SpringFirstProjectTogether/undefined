@@ -52,6 +52,7 @@ DROP TABLE IF EXISTS project_files;
 CREATE TABLE feeds
 (
 	feed_id int NOT NULL AUTO_INCREMENT,
+	user_id int NOT NULL,
 	feed_title varchar(200) NOT NULL,
 	feed_content text NOT NULL,
 	feed_state varchar(100) NOT NULL check ( feed_state IN ('comp', 'temp', 'del')),
@@ -95,8 +96,7 @@ CREATE TABLE feed_tags
 (
 	tag_id varchar(200) NOT NULL,
 	feed_id int NOT NULL,
-	PRIMARY KEY (tag_id, feed_id),
-	UNIQUE (tag_id)
+	PRIMARY KEY (tag_id, feed_id)
 );
 
 
@@ -909,6 +909,13 @@ ALTER TABLE user_port_url
 	REFERENCES users (user_id)
 	ON UPDATE RESTRICT
 	ON DELETE CASCADE
+;
+
+ALTER TABLE feeds
+    ADD FOREIGN KEY (user_id)
+        REFERENCES users (user_id)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ;
 
 
