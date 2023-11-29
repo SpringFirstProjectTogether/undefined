@@ -36,7 +36,6 @@ public class CommunityController {
         model.addAttribute("totalCnt", list == null ? 0 : list.size());
 
         Duration diff = Duration.between(start.toLocalTime(), end.toLocalTime());
-//        System.out.println("diff : " + diff.toMillis() / 1000.00);
         model.addAttribute("searchTime", diff.toMillis() / 1000.00);
 
         return "community/communityMainPage";
@@ -60,6 +59,7 @@ public class CommunityController {
             list.forEach(System.out::println);
         } else {
             list = communityService.findAllCompFeed();
+            searchOption = "all";
         }
         LocalDateTime end = LocalDateTime.now();
 
@@ -68,7 +68,6 @@ public class CommunityController {
         model.addAttribute("option", searchOption);
 
         Duration diff = Duration.between(start.toLocalTime(), end.toLocalTime());
-//        System.out.println("diff : " + diff.toMillis() / 1000.00);
         model.addAttribute("searchTime", diff.toMillis() / 1000.00);
 
         return "community/communityMainPage";

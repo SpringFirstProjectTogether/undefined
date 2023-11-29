@@ -1,6 +1,7 @@
 package com.lec.spring.service.community;
 
 import com.lec.spring.domain.community.FeedDTO;
+import com.lec.spring.domain.community.OuterCommentDTO;
 import com.lec.spring.repository.community.CommunityRepository;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Service;
@@ -35,12 +36,26 @@ public class CommunityServiceImpl implements CommunityService{
         return setTagListPerFeed(communityRepository.findAllCompFeedByAll(keyword));
     }
 
+    // 해당 피드의 태그 목록을 저장
+    // 그리고 댓글 목록도 초기화해주는 작업을 해주자
     public List<FeedDTO> setTagListPerFeed(List<FeedDTO> list) {
         for(var feed : list) {
+            // 해당 피드의 태그 목록을 스트링으로 저장
             List<String> tagList = communityRepository.findTagsByFeedId(feed.getFeedId());
             StringBuffer sb = new StringBuffer();
             tagList.forEach(tag -> sb.append("#").append(tag).append(" "));
             feed.setTagList(sb.toString());
+
+            // 해당 피드의 댓글 목록 초기화해주어야 한다.
+            // 먼저 부모 댓글들을 불러와보자.
+            List<OuterCommentDTO> outerComments = communityRepository.findOuterCommentsByFeedId(feed.getFeedId());
+            feed.setComments(outerComments);
+
+            // 부모 댓글의 자식 댓글들을 불러오자
+            feed.getComments().forEach(outerCommentDTO -> {
+                outerCommentDTO.setInnerCommentDTOList(communityRepository.findInnerCommentsByParentId(outerCommentDTO.getOuterCommentId()));
+            });
+
         }
         return list;
     }

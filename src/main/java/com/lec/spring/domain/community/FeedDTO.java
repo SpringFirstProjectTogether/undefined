@@ -19,7 +19,10 @@ public class FeedDTO {
     String feedContent;
     String feedState;
     Date feedRegdate;
+
     int likeCnt;
     String tagList;
+
     UserDTO user;
+    List<OuterCommentDTO> comments;
 }

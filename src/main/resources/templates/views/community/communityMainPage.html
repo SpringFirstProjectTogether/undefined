@@ -262,20 +262,16 @@
                                 <div th:id="${'Collapse' + feed.feedId}" class="accordion-collapse collapse hidden">
                                     <hr>
                                     <div class="accordion-body overflow-auto scrollbar" style="height: 150px;">
-                                        <div>Nickname</div>
-                                        <div>&nbsp;&nbsp;comment</div>
-                                        <span class="text-muted">&nbsp;&nbsp;답글달기</span>
-                                        <div>Nickname</div>
-                                        <div>&nbsp;&nbsp;comment</div>
-                                        <span class="text-muted">&nbsp;&nbsp;답글달기</span>
-                                        <div>Nickname</div>
-                                        <div>&nbsp;&nbsp;comment</div>
-                                        <span class="text-muted">&nbsp;&nbsp;답글달기</span>
-                                        <div>Nickname</div>
-                                        <div>&nbsp;&nbsp;comment</div>
-                                        <span class="text-muted">&nbsp;&nbsp;답글달기</span>
-                                        <div>Nickname</div>
-                                        <div>&nbsp;&nbsp;comment</div>
+                                        <div th:each="comment : ${feed.comments}">
+                                            <div th:text="${comment.writer}">Nickname</div>
+                                            &nbsp;&nbsp;<p th:text="${comment.outerContent}">comment</p>
+                                            <div class="ms-2">
+                                                <div th:each="reply: ${comment.innerCommentDTOList}">
+                                                    <div th:text="${reply.writer}">Nickname</div>
+                                                    &nbsp;&nbsp;<p th:text="${reply.innerContent}">comment</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <span class="text-muted">&nbsp;&nbsp;답글달기</span>
                                     </div>
                                     <br>

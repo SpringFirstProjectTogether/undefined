@@ -32,7 +32,6 @@
         <result column="nickname" property="nickname"/>
     </resultMap>
 
-
     <resultMap id="mapFeed" type="com.lec.spring.domain.community.FeedDTO">
         <result column="feed_id" property="feedId"/>
         <result column="feed_title" property="feedTitle"/>
@@ -40,7 +39,7 @@
         <result column="feed_state" property="feedState"/>
         <result column="feed_regdate" property="feedRegdate"/>
         <result column="likeCnt" property="likeCnt"/>
-        <collection property="user" resultMap="mapUser"/>
+        <association property="user" resultMap="mapUser"/>
     </resultMap>
 
     <select id="findAllCompFeed" resultMap="mapFeed">
@@ -65,9 +64,15 @@
 
     <select id="findAllCompFeedByAll" resultMap="mapFeed">
         <include refid="SELECT_BASE_USER_FEED"/>
-        AND nickname = #{nickname}
-        AND feed_state = 'comp'
-        ORDER BY feed_regdate DESC
+        WHERE EXISTS (
+            SELECT 1
+            FROM (SELECT feed_id FROM feed_tag_table WHERE tag_id = (SELECT tag_id FROM feed_tags WHERE tag_name = #{keyword})) t
+            WHERE feed_id = t.feed_id
+        )
+        OR
+            nickname = #{keyword}
+        ORDER BY
+            feed_regdate DESC
     </select>
 
     <select id="findTagsByFeedId" resultType="java.lang.String">
@@ -78,6 +83,38 @@
         WHERE
             feed_id = #{feedId}
     </select>
+
+    <select id="findFeedById" resultMap="mapFeed">
+        <include refid="SELECT_BASE_USER_FEED"/>
+        WHERE feed_id = #{id}
+    </select>
+
+
+    <select id="findOuterCommentsByFeedId" resultType="com.lec.spring.domain.community.OuterCommentDTO">
+        SELECT
+            comment_id "outerCommentId",
+            user_id "outerUserId",
+            content "outerContent",
+            (SELECT nickname FROM users u WHERE u.user_id = c.user_id) "writer"
+        FROM
+            feed_comments c
+        WHERE
+            feed_id = #{feedId}
+    </select>
+
+    <select id="findInnerCommentsByParentId" resultType="com.lec.spring.domain.community.InnerCommentDTO">
+        SELECT
+            comment_id "innerCommentId",
+            user_id "innerUserId",
+            parent_id "outerCommentId",
+            content "innerContent",
+            (SELECT nickname FROM users u WHERE u.user_id = c.user_id) "writer"
+        FROM
+            feed_comments c
+        WHERE
+            parent_id = #{outerCommentId}
+    </select>
+
 
 </mapper>
 
