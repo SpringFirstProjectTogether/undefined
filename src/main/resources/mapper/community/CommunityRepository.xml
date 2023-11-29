@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lec.spring.repository.community.CommunityRepository">
+
+    <sql id="SELECT_BASE_USER_FEED">
+        SELECT
+            f.feed_id,
+            f.feed_title,
+            f.feed_content,
+            f.feed_state,
+            f.feed_regdate,
+            u.user_id,
+            u.user_login_id,
+            u.user_password,
+            u.nickname,
+            (SELECT
+                 COUNT(*)
+             FROM
+                 feed_likes l
+             WHERE
+                 l.feed_id = f.feed_id
+             ) "likeCnt"
+        FROM
+            feeds f JOIN users u
+        ON f.user_id = u.user_id
+    </sql>
+
+    <resultMap id="mapUser" type="com.lec.spring.domain.UserDTO">
+        <result column="user_id" property="userId"/>
+        <result column="user_login_id" property="loginId"/>
+        <result column="user_password" property="password"/>
+        <result column="nickname" property="nickname"/>
+    </resultMap>
+
+
+    <resultMap id="mapFeed" type="com.lec.spring.domain.community.FeedDTO">
+        <result column="feed_id" property="feedId"/>
+        <result column="feed_title" property="feedTitle"/>
+        <result column="feed_content" property="feedContent"/>
+        <result column="feed_state" property="feedState"/>
+        <result column="feed_regdate" property="feedRegdate"/>
+        <result column="likeCnt" property="likeCnt"/>
+        <collection property="user" resultMap="mapUser"/>
+    </resultMap>
+
+    <select id="findAllCompFeed" resultMap="mapFeed">
+        <include refid="SELECT_BASE_USER_FEED"/>
+        WHERE feed_state = 'comp'
+        ORDER BY feed_regdate DESC
+    </select>
+
+    <select id="findAllCompFeedByNickname" resultMap="mapFeed">
+        <include refid="SELECT_BASE_USER_FEED"/>
+        WHERE nickname = #{nickname}
+        AND feed_state = 'comp'
+        ORDER BY feed_regdate DESC
+    </select>
+
+    <select id="findAllCompFeedByTag" resultMap="mapFeed">
+        <include refid="SELECT_BASE_USER_FEED"/>
+        JOIN feed_tags t ON t.tag_id = #{tag} AND t.feed_id = f.feed_id
+        WHERE feed_state = 'comp'
+        ORDER BY feed_regdate DESC
+    </select>
+
+    <select id="findAllCompFeedByAll" resultMap="mapFeed">
+        <include refid="SELECT_BASE_USER_FEED"/>
+        AND nickname = #{nickname}
+        AND feed_state = 'comp'
+        ORDER BY feed_regdate DESC
+    </select>
+
+    <select id="findTagsByFeedId" resultType="java.lang.String">
+        SELECT
+            tag_id
+        FROM
+            feed_tags
+        WHERE
+            feed_id = #{feedId}
+    </select>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
