@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="https://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8" />
@@ -136,7 +136,7 @@
                     <div class="collapse" id="collapseCommunity" aria-labelledby="headingOne"
                          data-bs-parent="#sidenavAccordion">
                         <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="layout-static.html">Main</a>
+                            <a class="nav-link" th:href="@{/community/list}">Main</a>
                             <a class="nav-link" href="layout-sidenav-light.html">Write</a>
                             <a class="nav-link" href="layout-sidenav-light.html">My Feed</a>
                         </nav>
@@ -167,36 +167,23 @@
 
                 <!--search bar-->
                 <div class="row justify-content-center">
-                    <!-- <div class="d-flex justify-content-center mt-1" style="max-width: 576px;">
-                        <ol class="breadcrumb mb-4 mt-6 w-100" >
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">All</a>
-                                <div class="dropdown-menu">
-                                  <p class="dropdown-item my-0">All</p>
-                                  <p class="dropdown-item my-0">Nickname</p>
-                                  <p class="dropdown-item my-0">Tag</p>
-                                </div>
-                            </li>
-                            <li class="breadcrumb-item active ms-2">Search</li>
-                        </ol>
-                    </div> -->
 
                     <div class="d-flex justify-content-center mb-2" style="max-width: 576px;">
-                        <form  class="w-100" style="max-width: 576px;">
+                        <form  class="w-100" id="searchForm" style="max-width: 576px;" th:action="@{/community/search}" method="get">
                             <fieldset class="d-flex">
                                 <div class="form-group col-2">
-                                    <select class="form-select">
-                                        <option class="dropdown-item">All</option>
-                                        <option class="dropdown-item">Nickname</option>
-                                        <option class="dropdown-item">Tag</option>
+                                    <select class="form-select" name="searchOption">
+                                        <option class="dropdown-item" value="all" th:selected="${option} == 'all'">All</option>
+                                        <option class="dropdown-item" value="nick" th:selected="${option} == 'nick'">Nickname</option>
+                                        <option class="dropdown-item" value="tag" th:selected="${option} == 'tag'">Tag</option>
                                     </select>
                                 </div>
 
                                 <div class="form-group col-8">
-                                    <input type="text" class="form-control" placeholder="Search">
+                                    <input type="text" class="form-control" name="keyword" placeholder="search">
                                 </div>
 
-                                <button type="submit" class="btn btn-primary col-2">Submit</button>
+                                <button type="submit" class="btn btn-primary col-2" id="searchSubmit">Submit</button>
                             </fieldset>
                         </form>
                     </div>
@@ -207,18 +194,18 @@
                 <!--검색 결과 수 보여주기-->
                 <div class="row justify-content-center">
                     <div class="text-start fs-6" style="max-width: 576px;">
-                        <p>검색 결과 ~ 개의 피드가 발견되었습니다. (0.01 sec)</p>
+                        <p>검색 결과 <span th:text="${totalCnt}">0</span> 개의 피드가 발견되었습니다. (<span th:text="${searchTime}">0.00</span> sec)</p>
                     </div>
                 </div>
 
                 <!--피드 글 보여주기-->
-                <div class="row">
+                <div class="row" th:each="feed : ${list}">
                     <div class="d-flex justify-content-center mt-1">
-                        <div class="card mb-3" style="max-width: 576px;">
+                        <div class="card mb-3" style="width: 576px;">
                             <div class="card-header container">
                                 <div class="row">
-                                    <h3 class="text-start col-9 col-sm-8 text-start pt-2">NicknameIsSoLongLong</h3>
-                                    <p class="text-end col-3 col-sm-4 text-end pt-3" style="font-size: 0.9em;">
+                                    <h3 class="text-start col-9 col-sm-8 pt-2" th:text="${feed.user.nickname}">Nickname</h3>
+                                    <p class="text-end col-3 col-sm-4 pt-3" style="font-size: 0.9em;" th:text="${#dates.format(feed.feedRegdate, 'yyyy.MM.dd hh:mm')}">
                                         2020.03.12
                                     </p>
                                 </div>
@@ -226,10 +213,10 @@
 
 
 
-                            <div class="card-body">
-                                <h5 class="card-title">feed title</h5>
-                                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                <div id="moreMessage" class="accordion-collapse collapse hidden">
+                            <div class="card-body col-12">
+                                <h5 class="card-title" th:text="${feed.feedTitle}">feed title</h5>
+                                <p class="card-text col-12" th:text="${feed.feedContent}">Some quick example text to build on the card title</p>
+                                <div th:id="${'moreMessage' + feed.feedId}" class="accordion-collapse collapse hidden">
                                     <div class="accordion-body overflow-auto scrollbar">
                                         <p>more content</p>
                                     </div>
@@ -237,7 +224,7 @@
                                 </div>
                             </div>
 
-                            <button class="btn btn-link text-start ps-0" type="button" data-bs-toggle="collapse" data-bs-target="#moreMessage" aria-expanded="true" aria-controls="moreMessage">
+                            <button class="btn btn-link text-start ps-0" type="button" data-bs-toggle="collapse" th:data-bs-target="${'#moreMessage' + feed.feedId}" aria-expanded="true" th:aria-controls="${'#moreMessage' + feed.feedId}">
                                 <p class="card-text text-muted ms-3">more...</p>
                             </button>
 
@@ -255,10 +242,13 @@
 
 
                             <div class="card-body container">
+                                <p class="tagList" th:text="${feed.tagList}">
+                                    #spring #java
+                                </p>
                                 <div class="row">
                                     <div class="col-7 col-sm-6 text-start">
-                                        <button type="button" class="btn btn-link col"><i class="fa-regular fa-thumbs-up fa-sm"></i>&nbsp;+12</button>
-                                        <button class="btn btn-link col" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        <button type="button" class="btn btn-link col"><i class="fa-regular fa-thumbs-up fa-sm"></i>&nbsp;+<span th:text="${feed.likeCnt}">0</span></button>
+                                        <button class="btn btn-link col" type="button" data-bs-toggle="collapse" th:data-bs-target="${'#Collapse' + feed.feedId}" aria-expanded="true" th:aria-controls="${'#Collapse' + feed.feedId}">
                                             <i class="fa-regular fa-comment fa-sm"></i>&nbsp;comment
                                         </button>
                                         <!-- <button type="button" class="btn btn-link col"><i class="fa-regular fa-comment fa-sm"></i>&nbsp;comment</button> -->
@@ -269,7 +259,7 @@
                                     </div>
 
                                 </div>
-                                <div id="collapseOne" class="accordion-collapse collapse hidden">
+                                <div th:id="${'Collapse' + feed.feedId}" class="accordion-collapse collapse hidden">
                                     <hr>
                                     <div class="accordion-body overflow-auto scrollbar" style="height: 150px;">
                                         <div>Nickname</div>

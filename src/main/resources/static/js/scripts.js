@@ -23,4 +23,9 @@ window.addEventListener('DOMContentLoaded', event => {
         });
     }
 
+    const searchBtn = document.body.querySelector('#searchSubmit');
+    searchBtn.addEventListener('click', event => {
+        document.body.querySelector('#searchForm').submit();
+    });
+
 });
