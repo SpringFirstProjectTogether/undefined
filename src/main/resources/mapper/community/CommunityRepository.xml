@@ -57,29 +57,27 @@
 
     <select id="findAllCompFeedByTag" resultMap="mapFeed">
         <include refid="SELECT_BASE_USER_FEED"/>
-        JOIN feed_tags t ON t.tag_id = #{tag} AND t.feed_id = f.feed_id
-        WHERE feed_state = 'comp'
+        WHERE EXISTS (SELECT 1 FROM feed_tags t1 JOIN feed_tag_table t2 ON t1.tag_id = t2.tag_id WHERE t1.tag_name = #{tag} AND t2.feed_id = f.feed_id )
+        AND f.feed_state = 'comp'
         ORDER BY feed_regdate DESC
     </select>
 
     <select id="findAllCompFeedByAll" resultMap="mapFeed">
         <include refid="SELECT_BASE_USER_FEED"/>
-        WHERE EXISTS (
-            SELECT 1
-            FROM (SELECT feed_id FROM feed_tag_table WHERE tag_id = (SELECT tag_id FROM feed_tags WHERE tag_name = #{keyword})) t
-            WHERE feed_id = t.feed_id
-        )
+        WHERE (EXISTS (SELECT 1 FROM feed_tags t1 JOIN feed_tag_table t2 ON t1.tag_id = t2.tag_id WHERE t1.tag_name = #{keyword} AND t2.feed_id = f.feed_id )
         OR
-            nickname = #{keyword}
+            u.nickname = #{keyword})
+        AND f.feed_state = 'comp'
         ORDER BY
             feed_regdate DESC
     </select>
 
     <select id="findTagsByFeedId" resultType="java.lang.String">
         SELECT
-            tag_id
+            t.tag_name
         FROM
-            feed_tags
+            feed_tags t JOIN feed_tag_table f
+            ON t.tag_id = f.tag_id
         WHERE
             feed_id = #{feedId}
     </select>
@@ -99,7 +97,7 @@
         FROM
             feed_comments c
         WHERE
-            feed_id = #{feedId}
+            feed_id = #{feedId} AND parent_id IS NULL
     </select>
 
     <select id="findInnerCommentsByParentId" resultType="com.lec.spring.domain.community.InnerCommentDTO">

@@ -27,6 +27,10 @@
             background: #c8c8c8;
             border-radius: 10px;
         }
+
+        #menubar::-webkit-scrollbar{
+            display: none;
+        }
     </style>
 </head>
 
@@ -70,7 +74,7 @@
                     <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
                        data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                         <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-                        Study
+                        Study/Project
                         <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                     </a>
                     <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne"
@@ -78,21 +82,6 @@
                         <nav class="sb-sidenav-menu-nested nav">
                             <a class="nav-link" href="layout-static.html">Menu1</a>
                             <a class="nav-link" href="layout-sidenav-light.html">Menu2</a>
-                        </nav>
-                    </div>
-
-                    <!--Project-->
-                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
-                       data-bs-target="#collapseProject" aria-expanded="false" aria-controls="collapseProject">
-                        <div class="sb-nav-link-icon"><i class="fa-solid fa-p"></i></div>
-                        &nbsp;Project
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
-                    <div class="collapse" id="collapseProject" aria-labelledby="headingOne"
-                         data-bs-parent="#sidenavAccordion">
-                        <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="layout-static.html">Menu1</a>
-                            <a class="nav-link" href="layout-sidenav-light.html">Menu2 </a>
                         </nav>
                     </div>
 
@@ -127,18 +116,26 @@
                     </div>
 
                     <!--Community-->
-                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
-                       data-bs-target="#collapseCommunity" aria-expanded="false" aria-controls="collapseCommunity">
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseCommu" aria-expanded="false" aria-controls="collapseCommu">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-users-between-lines"></i></div>
                         Community
                         <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                     </a>
-                    <div class="collapse" id="collapseCommunity" aria-labelledby="headingOne"
-                         data-bs-parent="#sidenavAccordion">
-                        <nav class="sb-sidenav-menu-nested nav">
+                    <div class="collapse" id="collapseCommu" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
                             <a class="nav-link" th:href="@{/community/list}">Main</a>
-                            <a class="nav-link" href="layout-sidenav-light.html">Write</a>
-                            <a class="nav-link" href="layout-sidenav-light.html">My Feed</a>
+                            <a class="nav-link" th:href="@{/community/write}">Write</a>
+                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseMyFeed" aria-expanded="false" aria-controls="collapseMyFeed">
+                                My Feed
+                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            </a>
+                            <div class="collapse" id="collapseMyFeed" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
+                                <nav class="sb-sidenav-menu-nested nav">
+                                    <a class="nav-link" th:href="@{/community/complete}">완료글</a>
+                                    <a class="nav-link" th:href="@{/community/temporal}">임시저장</a>
+                                    <a class="nav-link" th:href="@{/community/trash}">휴지통</a>
+                                </nav>
+                            </div>
                         </nav>
                     </div>
 
@@ -215,18 +212,30 @@
 
                             <div class="card-body col-12">
                                 <h5 class="card-title" th:text="${feed.feedTitle}">feed title</h5>
-                                <p class="card-text col-12" th:text="${feed.feedContent}">Some quick example text to build on the card title</p>
-                                <div th:id="${'moreMessage' + feed.feedId}" class="accordion-collapse collapse hidden">
-                                    <div class="accordion-body overflow-auto scrollbar">
-                                        <p>more content</p>
-                                    </div>
-                                    <br>
-                                </div>
+                                <p th:class="${'card-text col-12 feedText'+feed.feedId}" th:if="${feed.shortContent}" th:text="${feed.shortContent}">content</p>
+                                <p th:class="${'card-text col-12 feedText'+feed.feedId}" th:unless="${feed.shortContent}" th:text="${feed.feedContent}">content</p>
                             </div>
 
-                            <button class="btn btn-link text-start ps-0" type="button" data-bs-toggle="collapse" th:data-bs-target="${'#moreMessage' + feed.feedId}" aria-expanded="true" th:aria-controls="${'#moreMessage' + feed.feedId}">
+                            <button th:class="${'btn btn-link text-start ps-0 more'+feed.feedId}" th:if="${feed.shortContent}" type="button">
                                 <p class="card-text text-muted ms-3">more...</p>
                             </button>
+
+                            <script th:inline="javascript">
+                                const feedId = [[${feed.feedId}]];
+                                const moreBtn = document.body.querySelector(`.more${feedId}`);
+                                moreBtn.addEventListener('click', () => {
+                                    const content = document.body.querySelector(`.feedText${feedId}`);
+                                    let text = content.innerHTML;
+
+                                    if(text.length > 100) {
+                                        content.innerHTML = [[${feed.shortContent}]];
+                                        document.body.querySelector(`.more${feedId} > p`).innerHTML = 'more...';
+                                    } else {
+                                        content.innerHTML = [[${feed.feedContent}]];
+                                        document.body.querySelector(`.more${feedId} > p`).innerHTML = 'less...';
+                                    }
+                                });
+                            </script>
 
                             <div class="container" style="padding: 0 25px;">
                                 <div class="row">
@@ -263,19 +272,27 @@
                                     <hr>
                                     <div class="accordion-body overflow-auto scrollbar" style="height: 150px;">
                                         <div th:each="comment : ${feed.comments}">
-                                            <div th:text="${comment.writer}">Nickname</div>
-                                            &nbsp;&nbsp;<p th:text="${comment.outerContent}">comment</p>
-                                            <div class="ms-2">
+                                            <p>
+                                                <span class="fs-5" th:text="${comment.writer}">Nickname</span>
+                                                <br>
+                                            >&nbsp;<span class="fs-6" th:text="${comment.outerContent}">comment</span>
+                                            </p>
+                                            <div class="ms-4">
                                                 <div th:each="reply: ${comment.innerCommentDTOList}">
-                                                    <div th:text="${reply.writer}">Nickname</div>
-                                                    &nbsp;&nbsp;<p th:text="${reply.innerContent}">comment</p>
+                                                    <p>
+                                                        <span class="fs-5" th:text="${reply.writer}">Nickname</span>
+                                                        <br>
+                                                        >&nbsp;<span class="fs-6" th:text="${reply.innerContent}">comment</span>
+                                                    </p>
                                                 </div>
                                             </div>
+                                            <div class="text-muted mt-0" th:if="${comment}">답글달기</div>
+                                            <br>
                                         </div>
-                                        <span class="text-muted">&nbsp;&nbsp;답글달기</span>
+
                                     </div>
                                     <br>
-                                    <span class="text-muted">댓글달기</span>
+                                    <div class="text-muted">댓글달기</div>
                                 </div>
                             </div>
 

@@ -4,15 +4,11 @@ import com.lec.spring.domain.community.FeedDTO;
 import com.lec.spring.service.community.CommunityService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -71,5 +67,18 @@ public class CommunityController {
         model.addAttribute("searchTime", diff.toMillis() / 1000.00);
 
         return "community/communityMainPage";
+    }
+
+    @GetMapping("/write")
+    public String write() {
+        return "community/communityWrite";
+    }
+
+    @PostMapping("/write")
+    public String writeOk(
+//            @ResponseBody
+    ) {
+
+        return "community/writeOk";
     }
 }

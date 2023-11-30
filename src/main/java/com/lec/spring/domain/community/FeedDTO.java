@@ -1,11 +1,9 @@
 package com.lec.spring.domain.community;
 
 import com.lec.spring.domain.UserDTO;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -14,15 +12,22 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class FeedDTO {
-    long feedId;
-    String feedTitle;
-    String feedContent;
-    String feedState;
-    Date feedRegdate;
+    private long feedId;
+    private String feedTitle;
+    private String feedContent;
+    private String feedState;
+    private Date feedRegdate;
 
-    int likeCnt;
-    String tagList;
+    // 글의 추가적인 정보 <- 다른 테이블로 부터 얻어와야 함
+    private int likeCnt;
+    private String tagList;
+    private String shortContent;
 
-    UserDTO user;
-    List<OuterCommentDTO> comments;
+    private UserDTO user; // 글 작성자
+    private List<OuterCommentDTO> comments;  // 글의 댓글
+
+    // 첨부파일
+    @ToString.Exclude
+    @Builder.Default
+    private List<PhotoDTO> fileList = new ArrayList<>();
 }

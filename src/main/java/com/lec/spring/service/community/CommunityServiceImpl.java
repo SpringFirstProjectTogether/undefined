@@ -18,27 +18,28 @@ public class CommunityServiceImpl implements CommunityService{
 
     @Override
     public List<FeedDTO> findAllCompFeed() {
-        return setTagListPerFeed(communityRepository.findAllCompFeed());
+        return setOtherInfoPerFeed(communityRepository.findAllCompFeed());
     }
 
     @Override
     public List<FeedDTO> findAllCompFeedByNickname(String nickname) {
-        return setTagListPerFeed(communityRepository.findAllCompFeedByNickname(nickname));
+        return setOtherInfoPerFeed(communityRepository.findAllCompFeedByNickname(nickname));
     }
 
     @Override
     public List<FeedDTO> findAllCompFeedByTag(String tag) {
-        return setTagListPerFeed(communityRepository.findAllCompFeedByTag(tag));
+        return setOtherInfoPerFeed(communityRepository.findAllCompFeedByTag(tag));
     }
 
     @Override
     public List<FeedDTO> findAllCompFeedByAll(String keyword) {
-        return setTagListPerFeed(communityRepository.findAllCompFeedByAll(keyword));
+        return setOtherInfoPerFeed(communityRepository.findAllCompFeedByAll(keyword));
     }
 
     // 해당 피드의 태그 목록을 저장
     // 그리고 댓글 목록도 초기화해주는 작업을 해주자
-    public List<FeedDTO> setTagListPerFeed(List<FeedDTO> list) {
+    // 피드의 내용이 넘칠 때, 축소본
+    public List<FeedDTO> setOtherInfoPerFeed(List<FeedDTO> list) {
         for(var feed : list) {
             // 해당 피드의 태그 목록을 스트링으로 저장
             List<String> tagList = communityRepository.findTagsByFeedId(feed.getFeedId());
@@ -55,6 +56,11 @@ public class CommunityServiceImpl implements CommunityService{
             feed.getComments().forEach(outerCommentDTO -> {
                 outerCommentDTO.setInnerCommentDTOList(communityRepository.findInnerCommentsByParentId(outerCommentDTO.getOuterCommentId()));
             });
+
+            // 피드의 내용이 100자를 넘기게 된다면 축소분을 초기화시키자.
+            if(feed.getFeedContent().length() > 100) {
+                feed.setShortContent(feed.getFeedContent().substring(0, 100));
+            }
 
         }
         return list;
