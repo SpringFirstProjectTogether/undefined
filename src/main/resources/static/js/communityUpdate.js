@@ -15,6 +15,18 @@ window.addEventListener('DOMContentLoaded', event => {
         });
     }
 
+    const frm = document.body.querySelector('.writeForm');
+    const compBtn = document.body.querySelector('.compBtn');
+    compBtn.addEventListener('click', () => {
+        if(confirm("해당 피드를 수정하시겠습니까??")){
+            frm.submit();
+        }
+    })
+
+    const cancelBtn = document.body.querySelector('.cancelBtn');
+    cancelBtn.addEventListener('click', () => {
+        history.back();
+    })
 
 
     function DropFile(dropAreaId, fileListId) {
@@ -95,25 +107,5 @@ window.addEventListener('DOMContentLoaded', event => {
 
     const dropFile = new DropFile("drop-file", "files");
 
-    const frm = document.body.querySelector('.writeForm');
-
-    const compBtn = document.body.querySelector('.compBtn');
-    compBtn.addEventListener('click', () => {
-        document.querySelector('#feedState').setAttribute('value', 'comp');
-        frm.submit();
-    });
-
-    const tempBtn = document.body.querySelector('.tempBtn');
-    tempBtn.addEventListener('click', () => {
-        document.querySelector('#feedState').setAttribute('value', 'temp');
-        frm.submit();
-    });
-
-    const cancelBtn = document.body.querySelector('.cancelBtn');
-    cancelBtn.addEventListener('click', () => {
-        // 취소할 시 완료글 페이지로 이동
-        // frm.submit();
-        location.href = `list`;
-    });
 
 });

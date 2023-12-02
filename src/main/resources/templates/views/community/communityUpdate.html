@@ -1,10 +1,247 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html lang="ko" xmlns:th="https://www.thymeleaf.org">
 
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Community Main Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+    <link href="/css/styles.css" rel="stylesheet" />
+    <link href="/css/communityUpdate.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/sketchy/bootstrap.min.css">
+</head>
+
+<body class="sb-nav-fixed">
+<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+    <!-- Navbar Brand-->
+    <a class="navbar-brand ps-3" href="index.html">Undefined</a>
+    <!-- Sidebar Toggle-->
+    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i
+            class="fas fa-bars"></i></button>
+    <!-- Navbar-->
+    <ul class="navbar-nav ms-auto me-0 me-md-3 my-2 my-md-0">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown"
+               aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="#!">Profile</a></li>
+                <li>
+                    <hr class="dropdown-divider" />
+                </li>
+                <li><a class="dropdown-item" href="#!">Login</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+<div id="layoutSidenav">
+    <div id="layoutSidenav_nav">
+        <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
+            <div class="sb-sidenav-menu">
+                <div class="nav">
+                    <!--Home-->
+                    <div class="sb-sidenav-menu-heading">Home</div>
+                    <a class="nav-link" href="index.html">
+                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        Dashboard
+                    </a>
+
+                    <!--Category-->
+                    <div class="sb-sidenav-menu-heading">Category</div>
+                    <!--Study-->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                       data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                        <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
+                        Study/Project
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne"
+                         data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link" href="layout-static.html">Menu1</a>
+                            <a class="nav-link" href="layout-sidenav-light.html">Menu2</a>
+                        </nav>
+                    </div>
+
+                    <!--QnA-->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseQnA"
+                       aria-expanded="false" aria-controls="collapseQnA">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-comments"></i></div>
+                        QnA
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseQnA" aria-labelledby="headingOne"
+                         data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link" href="layout-static.html">Menu1</a>
+                            <a class="nav-link" href="layout-sidenav-light.html">Menu2 </a>
+                        </nav>
+                    </div>
+
+                    <!--Job Info-->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                       data-bs-target="#collapseJobInfo" aria-expanded="false" aria-controls="collapseJobInfo">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-circle-info"></i></div>
+                        Job Info
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseJobInfo" aria-labelledby="headingOne"
+                         data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link" href="layout-static.html">Menu1</a>
+                            <a class="nav-link" href="layout-sidenav-light.html">Menu2 </a>
+                        </nav>
+                    </div>
+
+                    <!--Community-->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseCommu" aria-expanded="false" aria-controls="collapseCommu">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-users-between-lines"></i></div>
+                        Community
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseCommu" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
+                            <a class="nav-link" th:href="@{/community/list}">Main</a>
+                            <a class="nav-link" th:href="@{/community/write}">Write</a>
+                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseMyFeed" aria-expanded="false" aria-controls="collapseMyFeed">
+                                My Feed
+                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            </a>
+                            <div class="collapse" id="collapseMyFeed" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
+                                <nav class="sb-sidenav-menu-nested nav">
+                                    <a class="nav-link" th:href="@{/community/complete}">완료글</a>
+                                    <a class="nav-link" th:href="@{/community/temporal}">임시저장</a>
+                                    <a class="nav-link" th:href="@{/community/trash}">휴지통</a>
+                                </nav>
+                            </div>
+                        </nav>
+                    </div>
+
+                    <div class="sb-sidenav-menu-heading">Account</div>
+                    <a class="nav-link" href="charts.html">
+                        <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                        Profile
+                    </a>
+                    <a class="nav-link" href="tables.html">
+                        <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                        Login
+                    </a>
+                </div>
+            </div>
+            <div class="sb-sidenav-footer">
+                <div class="small">Logged in as:</div>
+                undefined<!-- <= 로그인시 해당 유정의 닉네임으로 변경, 로그아웃시에는 undefined-->
+            </div>
+        </nav>
+    </div>
+    <div id="layoutSidenav_content">
+        <main>
+
+            <section class="d-flex justify-content-center mt-4 vw-50">
+                <div class="card border-primary w-75 mb-3" style="max-width: 576px;">
+
+                    <div class="card-body">
+                        <form method="post" th:action="@{/community/update}" enctype="multipart/form-data" class="writeForm">
+                            <fieldset>
+                                <legend th:text="${feed.user.nickname}">Nickname</legend>
+                                <div class="form-group">
+                                    <label class="col-form-label mt-0" for="feedTitle">Title</label>
+                                    <input type="text" class="form-control"
+                                           placeholder="Title ( maximum : 20 words )" id="feedTitle" th:value="${feed.feedTitle}">
+                                </div>
+
+
+                                <!--resize js 에서 구현-->
+                                <div class="form-group">
+                                    <label for="feedContent" class="form-label mt-4">Content</label>
+                                    <textarea class="form-control" id="feedContent" rows="10"
+                                              placeholder="Enter the content. ( maximum : 500 words )" th:text="${feed.feedContent}"></textarea>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class="col-form-label mt-4" for="feedTag">Tag</label>
+                                    <input type="text" class="form-control"
+                                           placeholder="Input tags. The delemeter of tags is comma ( , )" id="feedTag" th:value="${feed.tagList}">
+                                </div>
+
+
+                                <div class="form-group mt-4 contents">
+                                    <div class="upload-box">
+                                        <div id="drop-file" class="drag-file">
+                                            <img src="https://img.icons8.com/pastel-glyph/2x/image-file.png"
+                                                 alt="파일 아이콘" class="image">
+                                            <p class="message">Drag files to upload</p>
+                                        </div>
+                                        <label class="file-label" for="chooseFile">Choose File</label>
+                                        <input class="file" id="chooseFile" type="file" accept="image/*" multiple
+                                               onchange="dropFile.handleFiles(this.files)">
+                                    </div>
+                                    <div id="files" class="files">
+                                        <div class="file">
+                                            <div class="thumbnail">
+                                                <img src="https://img.icons8.com/pastel-glyph/2x/image-file.png"
+                                                     alt="파일타입 이미지" class="image">
+                                            </div>
+                                            <div class="details">
+                                                <header class="header">
+                                                    <span class="name">Photo.png</span>
+                                                    <span class="size">7.5 mb</span>
+                                                </header>
+                                                <div class="progress">
+                                                    <div class="bar"></div>
+                                                </div>
+                                                <!-- <div class="status">
+                                                    <span class="percent">37% done</span>
+                                                    <span class="speed">90KB/sec</span>
+                                                </div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <input type="text" id="feedState" style="display: none"/>
+
+                            </fieldset>
+                        </form>
+
+                        <div class="mt-5 ms-2">
+                            <button type="button" class="btn btn-outline-success col-sm-2 float-right compBtn"
+                                    style="font-size: 0.8em;">확인</button>
+                            <button type="button" class="btn btn-outline-danger col-sm-2 float-right cancelBtn"
+                                    style="font-size: 0.8em;">취소</button>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+        <footer class="py-4 bg-light mt-auto">
+            <div class="container-fluid px-4">
+                <div class="d-flex align-items-center justify-content-between small">
+                    <div class="text-muted">Copyright &copy; Undefined Website 2023</div>
+                    <div>
+                        <a href="#">Privacy Policy</a>
+                        &middot;
+                        <a href="#">Terms &amp; Conditions</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+<script src="/js/communityUpdate.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+<script src="/assets/demo/chart-area-demo.js"></script>
+<script src="/assets/demo/chart-bar-demo.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
+        crossorigin="anonymous"></script>
+<script src="/js/datatables-simple-demo.js"></script>
 </body>
+
 </html>

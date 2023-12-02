@@ -15,9 +15,13 @@ window.addEventListener('DOMContentLoaded', event => {
         });
     }
 
-    const searchBtn = document.body.querySelector('#searchSubmit');
-    searchBtn.addEventListener('click', event => {
-        document.body.querySelector('#searchForm').submit();
-    });
+    const allDelete = document.body.querySelector('.deleteAll');
+    allDelete.addEventListener('click', () => {
+        console.log("click~!~!~!")
+        if(confirm("임시저장글을 모두 삭제하시겠습니까? ( 복원 불가능 )")) {
+            location.href='/trash/deleteAll';
+        }
+    })
+
 
 });

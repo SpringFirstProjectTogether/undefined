@@ -144,27 +144,27 @@
                 <div class="card border-primary w-75 mb-3" style="max-width: 576px;">
 
                     <div class="card-body">
-                        <form method="post" action="#" enctype="multipart/form-data" class="writeForm">
+                        <form method="post" th:action="@{/community/write}" enctype="multipart/form-data" class="writeForm">
                             <fieldset>
                                 <legend>Nickname</legend>
                                 <div class="form-group">
                                     <label class="col-form-label mt-0" for="feedTitle">Title</label>
                                     <input type="text" class="form-control"
-                                           placeholder="Title ( maximum : 20 words )" id="feedTitle">
+                                           placeholder="Title ( maximum : 20 words )" id="feedTitle" name="feedTitle">
                                 </div>
 
 
                                 <!--resize js 에서 구현-->
                                 <div class="form-group">
                                     <label for="feedContent" class="form-label mt-4">Content</label>
-                                    <textarea class="form-control" id="feedContent" rows="10"
+                                    <textarea class="form-control" id="feedContent" name="feedContent" rows="10"
                                               placeholder="Enter the content. ( maximum : 500 words )"></textarea>
                                 </div>
 
 
                                 <div class="form-group">
                                     <label class="col-form-label mt-4" for="feedTag">Tag</label>
-                                    <input type="text" class="form-control"
+                                    <input type="text" class="form-control" name="feedTag"
                                            placeholder="Input tags. The delemeter of tags is comma ( , )" id="feedTag">
                                 </div>
 
@@ -203,7 +203,7 @@
                                     </div>
                                 </div>
 
-                                <input type="text" id="feedState" style="display: none"/>
+                                <input type="text" name="feedState" id="feedState" style="display: none"/>
 
                             </fieldset>
                         </form>

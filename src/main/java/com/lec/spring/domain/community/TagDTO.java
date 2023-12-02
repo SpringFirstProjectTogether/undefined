@@ -9,11 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-// 대댓글을 위한 DTO
-public class InnerCommentDTO {
-    Long innerCommentId;
-    Long innerUserId;
-    Long outerCommentId;
-    String innerContent;
-    String writer;
+public class TagDTO {
+    private Long tagId; // PK
+    private String tagName;
 }

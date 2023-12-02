@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lec.spring.repository.community.CommentRepository">
+
+    <sql id="SELECT_BASE_USER_OUTER">
+        SELECT
+            c.comment_id,
+            c.feed_id,
+            c.content,
+            c.user_id,
+            u.user_id,
+            u.user_login_id,
+            u.user_password,
+            u.nickname
+        FROM
+            feed_comments c JOIN users u
+            ON c.user_id = u.user_id
+    </sql>
+
+    <resultMap id="mapUser" type="com.lec.spring.domain.UserDTO">
+        <result column="user_id" property="userId"/>
+        <result column="user_login_id" property="loginId"/>
+        <result column="user_password" property="password"/>
+        <result column="nickname" property="nickname"/>
+    </resultMap>
+
+    <resultMap id="mapOuter" type="com.lec.spring.domain.community.CommentDTO">
+        <result column="comment_id" property="commentId"/>
+        <result column="feed_id" property="commentFeedId"/>
+        <result column="user_id" property="commentUserId"/>
+        <result column="content" property="commentContent"/>
+        <association property="user" resultMap="mapUser"/>
+    </resultMap>
+
+    <select id="findCommentByFeedId" resultMap="mapOuter">
+        <include refid="SELECT_BASE_USER_OUTER"/>
+        WHERE feed_id = #{id}
+    </select>
+
+    <insert id="addComment" flushCache="true" useGeneratedKeys="true" keyColumn="comment_id">
+        INSERT INTO feed_comments (feed_id, user_id, parent_id, content)
+        VALUES (#{commentFeedId}, #{user.userId}, null, #{commentContent})
+    </insert>
+
+    <delete id="deleteComment" flushCache="true">
+        DELETE FROM feed_comments WHERE comment_id = #{commentId}
+    </delete>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+

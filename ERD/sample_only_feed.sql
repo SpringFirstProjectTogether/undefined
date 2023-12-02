@@ -15,10 +15,10 @@ ALTER TABLE feeds
     AUTO_INCREMENT = 1;
 INSERT INTO feeds (user_id, feed_title, feed_content, feed_state)
 VALUES (1, 'title1', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi beatae corporis dignissimos dolores dolorum id incidunt ipsa ipsam iure maiores, minima, nobis perferendis perspiciatis provident sint veniam vitae! Eum, voluptatibus.', 'comp'),
-       (1, 'title2', 'content2', 'temp'),
-       (1, 'title3', 'content3', 'comp'),
-       (2, 'title4', 'content4', 'comp'),
-       (3, 'title5', 'content5', 'del');
+       (1, 'title2', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi beatae corporis dignissimos dolores dolorum id incidunt ipsa ipsam iure maiores, minima, nobis perferendis perspiciatis provident sint veniam vitae! Eum, voluptatibus.', 'temp'),
+       (1, 'title3', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi beatae corporis dignissimos dolores dolorum id incidunt ipsa ipsam iure maiores, minima, nobis perferendis perspiciatis provident sint veniam vitae! Eum, voluptatibus.', 'comp'),
+       (2, 'title4', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi beatae corporis dignissimos dolores dolorum id incidunt ipsa ipsam iure maiores, minima, nobis perferendis perspiciatis provident sint veniam vitae! Eum, voluptatibus.', 'comp'),
+       (3, 'title5', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi beatae corporis dignissimos dolores dolorum id incidunt ipsa ipsam iure maiores, minima, nobis perferendis perspiciatis provident sint veniam vitae! Eum, voluptatibus.', 'del');
 
 
 DELETE FROM feed_tags;

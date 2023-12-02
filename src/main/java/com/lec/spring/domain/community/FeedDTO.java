@@ -12,7 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class FeedDTO {
-    private long feedId;
+    private Long feedId;
+    private Long userId;
     private String feedTitle;
     private String feedContent;
     private String feedState;
@@ -24,7 +25,7 @@ public class FeedDTO {
     private String shortContent;
 
     private UserDTO user; // 글 작성자
-    private List<OuterCommentDTO> comments;  // 글의 댓글
+    private List<CommentDTO> comments;  // 글의 댓글
 
     // 첨부파일
     @ToString.Exclude

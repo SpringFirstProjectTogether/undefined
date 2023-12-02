@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.lec.spring.repository.community.CommunityRepository">
+<mapper namespace="com.lec.spring.repository.community.FeedRepository">
 
     <sql id="SELECT_BASE_USER_FEED">
         SELECT
             f.feed_id,
+            f.user_id,
             f.feed_title,
             f.feed_content,
             f.feed_state,
@@ -34,6 +35,7 @@
 
     <resultMap id="mapFeed" type="com.lec.spring.domain.community.FeedDTO">
         <result column="feed_id" property="feedId"/>
+        <result column="user_id" property="userId"/>
         <result column="feed_title" property="feedTitle"/>
         <result column="feed_content" property="feedContent"/>
         <result column="feed_state" property="feedState"/>
@@ -48,6 +50,24 @@
         ORDER BY feed_regdate DESC
     </select>
 
+    <select id="findAllCompFeedByUserId" resultMap="mapFeed">
+        <include refid="SELECT_BASE_USER_FEED"/>
+        WHERE feed_state = 'comp' AND f.user_id = #{userId}
+        ORDER BY feed_regdate DESC
+    </select>
+
+    <select id="findAllDelFeedByUserId" resultMap="mapFeed">
+        <include refid="SELECT_BASE_USER_FEED"/>
+        WHERE feed_state = 'del' AND f.user_id = #{userId}
+        ORDER BY feed_regdate DESC
+    </select>
+
+    <select id="findAllTempFeedByUserId" resultMap="mapFeed">
+        <include refid="SELECT_BASE_USER_FEED"/>
+        WHERE feed_state = 'temp' AND f.user_id = #{userId}
+        ORDER BY feed_regdate DESC
+    </select>
+
     <select id="findAllCompFeedByNickname" resultMap="mapFeed">
         <include refid="SELECT_BASE_USER_FEED"/>
         WHERE nickname = #{nickname}
@@ -57,16 +77,22 @@
 
     <select id="findAllCompFeedByTag" resultMap="mapFeed">
         <include refid="SELECT_BASE_USER_FEED"/>
-        WHERE EXISTS (SELECT 1 FROM feed_tags t1 JOIN feed_tag_table t2 ON t1.tag_id = t2.tag_id WHERE t1.tag_name = #{tag} AND t2.feed_id = f.feed_id )
+        WHERE f.feed_id IN (
+            <foreach collection="feedIdList" item="item" separator=",">
+                #{item}
+            </foreach>
+        )
         AND f.feed_state = 'comp'
         ORDER BY feed_regdate DESC
     </select>
 
     <select id="findAllCompFeedByAll" resultMap="mapFeed">
         <include refid="SELECT_BASE_USER_FEED"/>
-        WHERE (EXISTS (SELECT 1 FROM feed_tags t1 JOIN feed_tag_table t2 ON t1.tag_id = t2.tag_id WHERE t1.tag_name = #{keyword} AND t2.feed_id = f.feed_id )
-        OR
-            u.nickname = #{keyword})
+        WHERE f.feed_id IN (
+            <foreach collection="feedIdList" item="item" separator=",">
+                #{item}
+            </foreach>
+        )
         AND f.feed_state = 'comp'
         ORDER BY
             feed_regdate DESC
@@ -87,32 +113,35 @@
         WHERE feed_id = #{id}
     </select>
 
-
-    <select id="findOuterCommentsByFeedId" resultType="com.lec.spring.domain.community.OuterCommentDTO">
+    <select id="feedIdListByNickname" resultType="java.lang.Long">
         SELECT
-            comment_id "outerCommentId",
-            user_id "outerUserId",
-            content "outerContent",
-            (SELECT nickname FROM users u WHERE u.user_id = c.user_id) "writer"
+            f.feed_id
         FROM
-            feed_comments c
+            feeds f, users u
         WHERE
-            feed_id = #{feedId} AND parent_id IS NULL
+            f.user_id = u.user_id AND u.nickname = #{keyword}
     </select>
 
-    <select id="findInnerCommentsByParentId" resultType="com.lec.spring.domain.community.InnerCommentDTO">
-        SELECT
-            comment_id "innerCommentId",
-            user_id "innerUserId",
-            parent_id "outerCommentId",
-            content "innerContent",
-            (SELECT nickname FROM users u WHERE u.user_id = c.user_id) "writer"
-        FROM
-            feed_comments c
-        WHERE
-            parent_id = #{outerCommentId}
-    </select>
 
+
+    <insert id="saveFeed" flushCache="true" useGeneratedKeys="true" keyColumn="feed_id" keyProperty="feedId" parameterType="com.lec.spring.domain.community.FeedDTO">
+        INSERT INTO feeds (user_id, feed_title, feed_content, feed_state)
+        VALUES (#{user.userId}, #{feedTitle}, #{feedContent}, #{feedState})
+    </insert>
+
+    <delete id="deleteFeedById" flushCache="true">
+        DELETE FROM feeds WHERE feed_id = #{feedId}
+    </delete>
+
+    <delete id="deleteFeedAllByUesrId">
+        DELETE FROM feeds WHERE feed_state = 'del' AND user_id = #{userId}
+    </delete>
+
+    <update id="updateFeed" flushCache="true" parameterType="com.lec.spring.domain.community.FeedDTO">
+        UPDATE feeds
+        SET feed_title = #{feedTitle}, feed_state = #{feedState}, feed_content = #{feedContent}
+        WHERE feed_id = #{feedId}
+    </update>
 
 </mapper>
 
