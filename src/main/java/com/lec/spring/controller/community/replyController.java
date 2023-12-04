@@ -24,11 +24,12 @@ public class replyController {
             String content,
             Model model
     ) {
+        System.out.println("reply Info : " + parentId);
 
         int result = replyService.addReplyByParentId(parentId, feedId, content);
         model.addAttribute("result", result);
 
-        return "communtiy/replyWriteOk";
+        return "community/replyWriteOk";
     }
 
     @PostMapping("/delete")
@@ -39,7 +40,7 @@ public class replyController {
         int result = replyService.deleteReplyById(replyId);
         model.addAttribute("result", result);
 
-        return "commnuity/replyDeleteOk";
+        return "community/replyDeleteOk";
     }
 
 }

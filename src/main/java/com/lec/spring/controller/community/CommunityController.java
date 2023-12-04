@@ -21,18 +21,8 @@ public class CommunityController {
     }
 
     @RequestMapping("/list")
-    public String list(Model model) {
-        LocalDateTime start = LocalDateTime.now();
-        List<FeedDTO> list = feedService.findAllCompFeed();
-        LocalDateTime end = LocalDateTime.now();
-
-        model.addAttribute("list", list);
-        model.addAttribute("option", "all");
-        model.addAttribute("totalCnt", list == null ? 0 : list.size());
-
-        Duration diff = Duration.between(start.toLocalTime(), end.toLocalTime());
-        model.addAttribute("searchTime", diff.toMillis() / 1000.00);
-
+    public String list(Integer page, Model model) {
+        feedService.list(page, model);
         return "community/communityMainPage";
     }
 
@@ -40,30 +30,19 @@ public class CommunityController {
     public String search(
             @RequestParam String searchOption
             , @RequestParam String keyword
+            , Integer page
             , Model model
     ) {
 
-        LocalDateTime start = LocalDateTime.now();
-        List<FeedDTO> list = null;
         if(!keyword.isEmpty()) {
-            list = switch (searchOption) {
-                case "nick" -> feedService.findAllCompFeedByNickname(keyword);
-                case "tag" -> feedService.findAllCompFeedByTag(keyword);
-                default -> feedService.findAllCompFeedByAll(keyword);
-            };
-            list.forEach(System.out::println);
+            switch (searchOption) {
+                case "nick" -> feedService.listByNickname(keyword, page, model);
+                case "tag" -> feedService.listByTag(keyword, page, model);
+                default -> feedService.listByAll(keyword, page, model);
+            }
         } else {
-            list = feedService.findAllCompFeed();
-            searchOption = "all";
+            feedService.list(page, model);
         }
-        LocalDateTime end = LocalDateTime.now();
-
-        model.addAttribute("totalCnt", list == null ? 0 : list.size());
-        model.addAttribute("list", list);
-        model.addAttribute("option", searchOption);
-
-        Duration diff = Duration.between(start.toLocalTime(), end.toLocalTime());
-        model.addAttribute("searchTime", diff.toMillis() / 1000.00);
 
         return "community/communityMainPage";
     }

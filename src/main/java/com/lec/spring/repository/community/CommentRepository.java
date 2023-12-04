@@ -7,7 +7,7 @@ import java.util.List;
 public interface CommentRepository {
 
     // feed id 로 해당 피드의 댓글 찾기
-    List<CommentDTO> findCommentByFeedId(Long id);
+    List<CommentDTO> findCommentsByFeedId(Long id);
 
     // 댓글 작성
     int addComment(CommentDTO commentDTO);

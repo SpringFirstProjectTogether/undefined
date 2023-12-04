@@ -9,15 +9,28 @@ import com.lec.spring.repository.community.FeedRepository;
 import com.lec.spring.repository.community.ReplyRepository;
 import com.lec.spring.repository.community.CommentRepository;
 import com.lec.spring.repository.community.TagRepository;
+import jakarta.servlet.http.HttpSession;
 import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import com.lec.spring.util.U;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 @Service
 public class FeedServiceImpl implements FeedService {
+
+    @Value("${app.pagination.page_rows}")
+    private int PAGE_ROWS;
+
+    @Value("${app.pagination.write_pages}")
+    private int WRITE_PAGES;
+
     FeedRepository feedRepository;
     CommentRepository commentRepository;
     ReplyRepository replyRepository;
@@ -31,120 +44,27 @@ public class FeedServiceImpl implements FeedService {
 
         System.out.println("FeedServiceImpl() 생성");
     }
-    
-    // feed 서비스는 feed와 관련된 동작들을 구현
-    // 닉네임, 태그, 전체 별로 검색 기능
-    // => findAllCompFeed, findAllCompFeedByNickname, findAllCompFeedByTag, findAllCompFeedByAll
-    // => 다른 repository 와 같이 써야 할 듯
-    // => 메소드마다 한 책임씩!! => 댓글 가져오는 메소드, 대댓글 가져오는 메소드
 
     // feed의 모든 댓글 가져오기
-    public List<CommentDTO> findAllOuterCommentByFeedId(Long feedId) {
-        var list = commentRepository.findCommentByFeedId(feedId);
-        
+    public List<CommentDTO> findCommentsByFeedId(Long feedId) {
+        var list = commentRepository.findCommentsByFeedId(feedId);
+        System.out.println("comment list : " + list);
+
         // 해당 댓글의 모든 대댓글 가져오기
         list.forEach(outer -> {
-            outer.setReplyDTOList(findAllInnerCommentByParentId(outer.getCommentId()));
+            outer.setReplyDTOList(findRepliesByParentId(outer.getCommentId()));
         });
 
         return list;
     }
 
     // 댓글의 모든 대댓글 가져오기
-    @Override
-    public List<ReplyDTO> findAllInnerCommentByParentId(Long parentId) {
+    public List<ReplyDTO> findRepliesByParentId(Long parentId) {
         return replyRepository.findReplyByParentID(parentId);
     }
-    
-    // 완료된 모든 피드글 가져오기
-    @Override
-    public List<FeedDTO> findAllCompFeed() {
-        var list = feedRepository.findAllCompFeed();
 
-        if(list != null) {
-            // 해당 피드의 모든 댓글 가져오기
-            list.forEach(feed -> {
-                feed.setComments(findAllOuterCommentByFeedId(feed.getFeedId()));
-            });
-
-            setShortContentPerFeed(list);
-            setTagListPerFeed(list);
-        }
-
-        return list;
-    }
-
-    // 해당 Nickname을 가진 유저가 작성한 모든 피드글 가져오기
-    // 추후에 완료글 리스트에서도 사용
-    @Override
-    public List<FeedDTO> findAllCompFeedByNickname(String nickname) {
-        var list = feedRepository.findAllCompFeedByNickname(nickname);
-
-        if(list != null) {
-            // 해당 피드의 모든 댓글 가져오기
-            list.forEach(feed -> {
-                feed.setComments(findAllOuterCommentByFeedId(feed.getFeedId()));
-            });
-
-            setShortContentPerFeed(list);
-            setTagListPerFeed(list);
-        }
-
-        return list;
-    }
-
-    // 해당 태그를 가지는 모든 피드 글 가져오기
-    @Override
-    public List<FeedDTO> findAllCompFeedByTag(String tag) {
-        // 해당 tag를 가지고 있는 feed_id 리스트 호출
-        Set<Long> feedIdList = tagRepository.feedIdListByTag(tag);
-        
-        // feed_id list 에 포함되어 있는 feed 불러오기
-        var list = feedRepository.findAllCompFeedByTag(feedIdList);
-
-        if(list != null) {
-            // 해당 피드의 모든 댓글 가져오기
-            list.forEach(feed -> {
-                feed.setComments(findAllOuterCommentByFeedId(feed.getFeedId()));
-            });
-
-            setShortContentPerFeed(list);
-            setTagListPerFeed(list);
-        }
-
-        return list;
-    }
-
-    // 닉네임, 태그 찾기 기능이 합쳐진 전체 기능을 위한 메소드
-    @Override
-    public List<FeedDTO> findAllCompFeedByAll(String keyword) {
-        // 해당 키워드를 태그로 가지는 feed_id 불러오기
-        Set<Long> feedIdList = tagRepository.feedIdListByTag(keyword);
-
-        // 해당 키워드를 닉네임으로 가지는 feed_id 추가
-        if(feedIdList != null) {
-            feedIdList.addAll(feedRepository.feedIdListByNickname(keyword));
-        } else {
-            feedIdList = feedRepository.feedIdListByNickname(keyword);
-        }
-
-        var list = feedRepository.findAllCompFeedByAll(feedIdList);
-
-        if(list != null) {
-            // 해당 피드의 모든 댓글 가져오기
-            list.forEach(feed -> {
-                feed.setComments(findAllOuterCommentByFeedId(feed.getFeedId()));
-            });
-
-            setShortContentPerFeed(list);
-            setTagListPerFeed(list);
-        }
-
-        return list;
-    }
 
     // 해당 피드의 태그 목록을 저장
-    @Override
     public void setTagListPerFeed(List<FeedDTO> list) {
         for(var feed : list) {
             // 해당 피드의 태그 목록을 스트링으로 저장
@@ -156,9 +76,8 @@ public class FeedServiceImpl implements FeedService {
 //            System.out.println("tag : " + feed.getTagList());
         }
     }
-    
+
     // 피드의 내용이 넘칠 때, 축소본
-    @Override
     public void setShortContentPerFeed(List<FeedDTO> list) {
         for(var feed : list) {
             // 피드의 내용이 100자를 넘기게 된다면 축소분을 초기화시키자.
@@ -169,6 +88,289 @@ public class FeedServiceImpl implements FeedService {
         }
     }
 
+    @Override
+    public List<FeedDTO> list(Integer page, Model model) {
+        // 현재 페이지 parameter
+        if(page == null) page = 1;  // 디폴트는 1page
+        if(page < 1) page = 1;
+
+        // 페이징
+        // writePages: 한 [페이징] 당 몇개의 페이지가 표시되나
+        // pageRows: 한 '페이지'에 몇개의 글을 리스트 할것인가?
+        HttpSession session = U.getSession();
+        Integer writePages = (Integer)session.getAttribute("writePages");
+        if(writePages == null) writePages = WRITE_PAGES;  // 만약 session 에 없으면 기본값으로 동작
+        Integer pageRows = (Integer)session.getAttribute("pageRows");
+        if(pageRows == null) pageRows = PAGE_ROWS;  // 만약 session 에 없으면 기본값으로 동작
+
+        // 현재 페이지 번호 -> session 에 저장
+        session.setAttribute("page", page);
+
+        long cnt = feedRepository.countAll();   // 글 목록 전체의 개수
+        int totalPage = (int)Math.ceil(cnt / (double)pageRows);   // 총 몇 '페이지' ?
+
+        // [페이징] 에 표시할 '시작페이지' 와 '마지막페이지'
+        int startPage = 0;
+        int endPage = 0;
+
+        // 해당 페이지의 글 목록
+        List<FeedDTO> list = null;
+
+        if(cnt > 0){  // 데이터가 최소 1개 이상 있는 경우만 페이징
+            //  page 값 보정
+            if(page > totalPage) page = totalPage;
+
+            // 몇번째 데이터부터 fromRow
+            int fromRow = (page - 1) * pageRows;
+
+            // [페이징] 에 표시할 '시작페이지' 와 '마지막페이지' 계산
+            startPage = (((page - 1) / writePages) * writePages) + 1;
+            endPage = startPage + writePages - 1;
+            if (endPage >= totalPage) endPage = totalPage;
+
+            // 해당페이지의 글 목록 읽어오기
+            LocalDateTime start = LocalDateTime.now();
+            list = feedRepository.findAllCompFeedFromRow(fromRow, pageRows);
+            if(list != null) {
+                // 해당 피드의 모든 댓글 가져오기
+                list.forEach(feed -> {
+                    feed.setComments(findCommentsByFeedId(feed.getFeedId()));
+                });
+
+                setShortContentPerFeed(list);
+                setTagListPerFeed(list);
+            }
+            LocalDateTime end = LocalDateTime.now();
+            model.addAttribute("list", list);
+
+            Duration diff = Duration.between(start.toLocalTime(), end.toLocalTime());
+            model.addAttribute("searchTime", diff.toMillis() / 1000.00);
+        } else {
+            page = 0;
+        }
+
+        model.addAttribute("option", "all");
+        model.addAttribute("totalCnt", cnt);  // 전체 글 개수
+        model.addAttribute("page", page); // 현재 페이지
+        model.addAttribute("totalPage", totalPage);  // 총 '페이지' 수
+        model.addAttribute("pageRows", pageRows);  // 한 '페이지' 에 표시할 글 개수
+
+        // [페이징]
+        model.addAttribute("url", U.getRequest().getRequestURI());  // 목록 url
+        model.addAttribute("writePages", writePages); // [페이징] 에 표시할 숫자 개수
+        model.addAttribute("startPage", startPage);  // [페이징] 에 표시할 시작 페이지
+        model.addAttribute("endPage", endPage);   // [페이징] 에 표시할 마지막 페이지
+
+        return list;
+    }
+
+
+    // 해당 Nickname을 가진 유저가 작성한 모든 피드글 가져오기
+    // 추후에 완료글 리스트에서도 사용
+    @Override
+    public List<FeedDTO> listByNickname(String nickname, Integer page, Model model) {
+        // 현재 페이지 parameter
+        if(page == null) page = 1;  // 디폴트는 1page
+        if(page < 1) page = 1;
+
+        HttpSession session = U.getSession();
+        Integer writePages = (Integer)session.getAttribute("writePages");
+        if(writePages == null) writePages = WRITE_PAGES;  // 만약 session 에 없으면 기본값으로 동작
+        Integer pageRows = (Integer)session.getAttribute("pageRows");
+        if(pageRows == null) pageRows = PAGE_ROWS;  // 만약 session 에 없으면 기본값으로 동작
+
+        // 현재 페이지 번호 -> session 에 저장
+        session.setAttribute("page", page);
+
+        long cnt = feedRepository.countAllByNickname(nickname);   // 글 목록 전체의 개수
+        int totalPage = (int)Math.ceil(cnt / (double)pageRows);   // 총 몇 '페이지' ?
+
+        int startPage = 0;
+        int endPage = 0;
+
+        List<FeedDTO> list = null;
+
+        if(cnt > 0){
+            if(page > totalPage) page = totalPage;
+            int fromRow = (page - 1) * pageRows;
+
+            startPage = (((page - 1) / writePages) * writePages) + 1;
+            endPage = startPage + writePages - 1;
+            if (endPage >= totalPage) endPage = totalPage;
+
+            LocalDateTime start = LocalDateTime.now();
+            list = feedRepository.listByNicknameFromRow(nickname, fromRow, pageRows);
+            if(list != null) {
+                list.forEach(feed -> {
+                    feed.setComments(findCommentsByFeedId(feed.getFeedId()));
+                });
+
+                setShortContentPerFeed(list);
+                setTagListPerFeed(list);
+            }
+            LocalDateTime end = LocalDateTime.now();
+            model.addAttribute("list", list);
+
+            Duration diff = Duration.between(start.toLocalTime(), end.toLocalTime());
+            model.addAttribute("searchTime", diff.toMillis() / 1000.00);
+        } else {
+            page = 0;
+        }
+
+        model.addAttribute("option", "nickname");
+        model.addAttribute("totalCnt", cnt);  // 전체 글 개수
+        model.addAttribute("page", page); // 현재 페이지
+        model.addAttribute("totalPage", totalPage);  // 총 '페이지' 수
+        model.addAttribute("pageRows", pageRows);  // 한 '페이지' 에 표시할 글 개수
+
+        // [페이징]
+        model.addAttribute("url", U.getRequest().getRequestURI());  // 목록 url
+        model.addAttribute("writePages", writePages); // [페이징] 에 표시할 숫자 개수
+        model.addAttribute("startPage", startPage);  // [페이징] 에 표시할 시작 페이지
+        model.addAttribute("endPage", endPage);   // [페이징] 에 표시할 마지막 페이지
+
+        return list;
+    }
+
+    @Override
+    public List<FeedDTO> listByTag(String tag, Integer page, Model model) {
+        // 현재 페이지 parameter
+        if(page == null) page = 1;  // 디폴트는 1page
+        if(page < 1) page = 1;
+
+        HttpSession session = U.getSession();
+        Integer writePages = (Integer)session.getAttribute("writePages");
+        if(writePages == null) writePages = WRITE_PAGES;  // 만약 session 에 없으면 기본값으로 동작
+        Integer pageRows = (Integer)session.getAttribute("pageRows");
+        if(pageRows == null) pageRows = PAGE_ROWS;  // 만약 session 에 없으면 기본값으로 동작
+
+        // 현재 페이지 번호 -> session 에 저장
+        session.setAttribute("page", page);
+
+        Set<Long> feedIdList = tagRepository.feedIdListByTag(tag);
+        long cnt = feedRepository.countAllByTag(feedIdList);   // 글 목록 전체의 개수
+        int totalPage = (int)Math.ceil(cnt / (double)pageRows);   // 총 몇 '페이지' ?
+
+        int startPage = 0;
+        int endPage = 0;
+
+        List<FeedDTO> list = null;
+
+        if(cnt > 0){
+            if(page > totalPage) page = totalPage;
+            int fromRow = (page - 1) * pageRows;
+
+            startPage = (((page - 1) / writePages) * writePages) + 1;
+            endPage = startPage + writePages - 1;
+            if (endPage >= totalPage) endPage = totalPage;
+
+            LocalDateTime start = LocalDateTime.now();
+            list = feedRepository.listByTagFromRow(feedIdList, fromRow, pageRows);
+            if(list != null) {
+                list.forEach(feed -> {
+                    feed.setComments(findCommentsByFeedId(feed.getFeedId()));
+                });
+
+                setShortContentPerFeed(list);
+                setTagListPerFeed(list);
+            }
+            LocalDateTime end = LocalDateTime.now();
+            model.addAttribute("list", list);
+
+            Duration diff = Duration.between(start.toLocalTime(), end.toLocalTime());
+            model.addAttribute("searchTime", diff.toMillis() / 1000.00);
+        } else {
+            page = 0;
+        }
+
+        model.addAttribute("option", "tag");
+        model.addAttribute("totalCnt", cnt);  // 전체 글 개수
+        model.addAttribute("page", page); // 현재 페이지
+        model.addAttribute("totalPage", totalPage);  // 총 '페이지' 수
+        model.addAttribute("pageRows", pageRows);  // 한 '페이지' 에 표시할 글 개수
+
+        // [페이징]
+        model.addAttribute("url", U.getRequest().getRequestURI());  // 목록 url
+        model.addAttribute("writePages", writePages); // [페이징] 에 표시할 숫자 개수
+        model.addAttribute("startPage", startPage);  // [페이징] 에 표시할 시작 페이지
+        model.addAttribute("endPage", endPage);   // [페이징] 에 표시할 마지막 페이지
+
+        return list;
+    }
+
+    @Override
+    public List<FeedDTO> listByAll(String keyword, Integer page, Model model) {
+        // 현재 페이지 parameter
+        if(page == null) page = 1;  // 디폴트는 1page
+        if(page < 1) page = 1;
+
+        HttpSession session = U.getSession();
+        Integer writePages = (Integer)session.getAttribute("writePages");
+        if(writePages == null) writePages = WRITE_PAGES;  // 만약 session 에 없으면 기본값으로 동작
+        Integer pageRows = (Integer)session.getAttribute("pageRows");
+        if(pageRows == null) pageRows = PAGE_ROWS;  // 만약 session 에 없으면 기본값으로 동작
+
+        // 현재 페이지 번호 -> session 에 저장
+        session.setAttribute("page", page);
+
+        Set<Long> feedIdList = tagRepository.feedIdListByTag(keyword);
+        // 해당 키워드를 닉네임으로 가지는 feed_id 추가
+        if(feedIdList != null) {
+            feedIdList.addAll(feedRepository.feedIdListByNickname(keyword));
+        } else {
+            feedIdList = feedRepository.feedIdListByNickname(keyword);
+        }
+
+
+        long cnt = feedRepository.countAllByTag(feedIdList);   // 글 목록 전체의 개수
+        int totalPage = (int)Math.ceil(cnt / (double)pageRows);   // 총 몇 '페이지' ?
+
+        int startPage = 0;
+        int endPage = 0;
+
+        List<FeedDTO> list = null;
+
+        if(cnt > 0){
+            if(page > totalPage) page = totalPage;
+            int fromRow = (page - 1) * pageRows;
+
+            startPage = (((page - 1) / writePages) * writePages) + 1;
+            endPage = startPage + writePages - 1;
+            if (endPage >= totalPage) endPage = totalPage;
+
+            LocalDateTime start = LocalDateTime.now();
+            list = feedRepository.listByAllFromRow(feedIdList, fromRow, pageRows);
+            if(list != null) {
+                list.forEach(feed -> {
+                    feed.setComments(findCommentsByFeedId(feed.getFeedId()));
+                });
+
+                setShortContentPerFeed(list);
+                setTagListPerFeed(list);
+            }
+            LocalDateTime end = LocalDateTime.now();
+            model.addAttribute("list", list);
+
+            Duration diff = Duration.between(start.toLocalTime(), end.toLocalTime());
+            model.addAttribute("searchTime", diff.toMillis() / 1000.00);
+        } else {
+            page = 0;
+        }
+
+        model.addAttribute("option", "all");
+        model.addAttribute("totalCnt", cnt);  // 전체 글 개수
+        model.addAttribute("page", page); // 현재 페이지
+        model.addAttribute("totalPage", totalPage);  // 총 '페이지' 수
+        model.addAttribute("pageRows", pageRows);  // 한 '페이지' 에 표시할 글 개수
+
+        // [페이징]
+        model.addAttribute("url", U.getRequest().getRequestURI());  // 목록 url
+        model.addAttribute("writePages", writePages); // [페이징] 에 표시할 숫자 개수
+        model.addAttribute("startPage", startPage);  // [페이징] 에 표시할 시작 페이지
+        model.addAttribute("endPage", endPage);   // [페이징] 에 표시할 마지막 페이지
+
+        return list;
+    }
 
     // 특정 id의 피드 글 불러오는 메소드
     // update 시 기존의 내용을 보여주기 위함
@@ -215,6 +417,8 @@ public class FeedServiceImpl implements FeedService {
 
         return list;
     }
+
+
 
 
     // feed 추가/삭제/수정

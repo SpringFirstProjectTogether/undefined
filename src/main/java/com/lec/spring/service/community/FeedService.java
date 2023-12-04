@@ -3,26 +3,15 @@ package com.lec.spring.service.community;
 import com.lec.spring.domain.community.FeedDTO;
 import com.lec.spring.domain.community.ReplyDTO;
 import com.lec.spring.domain.community.CommentDTO;
+import org.springframework.ui.Model;
 
 import java.util.List;
 
 public interface FeedService {
-    List<CommentDTO> findAllOuterCommentByFeedId(Long feedId);
-
-    List<ReplyDTO> findAllInnerCommentByParentId(Long parentId);
-    List<FeedDTO> findAllCompFeed();
-
-    List<FeedDTO> findAllCompFeedByNickname(String nickname);
-    List<FeedDTO> findAllCompFeedByTag(String tag);
-
-    List<FeedDTO> findAllCompFeedByAll(String keyword);
 
     int writeFeed(FeedDTO feed);
 
     int deleteFeed(Long feedId);
-
-    void setTagListPerFeed(List<FeedDTO> list);
-    void setShortContentPerFeed(List<FeedDTO> list);
 
     int updateFeed(FeedDTO feed);
 
@@ -41,4 +30,12 @@ public interface FeedService {
     int restoreFeed(Long feedId);
 
     List<FeedDTO> findAllTempFeedByUserId(Long userId);
+
+
+
+    // 리스트 함수
+    List<FeedDTO> list(Integer page, Model model);
+    List<FeedDTO> listByNickname(String nickname, Integer page, Model model);
+    List<FeedDTO> listByTag(String nickname, Integer page, Model model);
+    List<FeedDTO> listByAll(String keyword, Integer page, Model model);
 }

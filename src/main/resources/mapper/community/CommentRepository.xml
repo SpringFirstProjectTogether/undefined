@@ -32,12 +32,12 @@
         <association property="user" resultMap="mapUser"/>
     </resultMap>
 
-    <select id="findCommentByFeedId" resultMap="mapOuter">
+    <select id="findCommentsByFeedId" resultMap="mapOuter">
         <include refid="SELECT_BASE_USER_OUTER"/>
-        WHERE feed_id = #{id}
+        WHERE feed_id = #{id} AND parent_id is null;
     </select>
 
-    <insert id="addComment" flushCache="true" useGeneratedKeys="true" keyColumn="comment_id">
+    <insert id="addComment" flushCache="true" useGeneratedKeys="true" keyColumn="comment_id" keyProperty="commentId">
         INSERT INTO feed_comments (feed_id, user_id, parent_id, content)
         VALUES (#{commentFeedId}, #{user.userId}, null, #{commentContent})
     </insert>

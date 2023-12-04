@@ -39,7 +39,7 @@
         WHERE parent_id = #{parentId}
     </select>
 
-    <insert id="addReplyComment" flushCache="true" useGeneratedKeys="true" keyColumn="comment_id" keyProperty="innerCommentId">
+    <insert id="addReplyComment" flushCache="true" useGeneratedKeys="true" keyColumn="comment_id" keyProperty="replyId">
         INSERT INTO feed_comments (feed_id, user_id, parent_id, content)
         VALUES (#{replyFeedId}, #{user.userId}, #{commentId}, #{replyContent})
     </insert>

@@ -44,10 +44,44 @@
         <association property="user" resultMap="mapUser"/>
     </resultMap>
 
-    <select id="findAllCompFeed" resultMap="mapFeed">
+    <select id="findAllCompFeedFromRow" resultMap="mapFeed">
         <include refid="SELECT_BASE_USER_FEED"/>
         WHERE feed_state = 'comp'
         ORDER BY feed_regdate DESC
+        LIMIT #{param1}, #{param2}
+    </select>
+
+    <select id="listByNicknameFromRow" resultMap="mapFeed">
+        <include refid="SELECT_BASE_USER_FEED"/>
+        WHERE nickname = #{param1}
+        AND feed_state = 'comp'
+        ORDER BY feed_regdate DESC
+        LIMIT #{param2}, #{param3}
+    </select>
+
+    <select id="listByTagFromRow" resultMap="mapFeed">
+        <include refid="SELECT_BASE_USER_FEED"/>
+        WHERE f.feed_id IN (
+        <foreach collection="feedIdList" item="item" separator=",">
+            #{item}
+        </foreach>
+        )
+        AND f.feed_state = 'comp'
+        ORDER BY feed_regdate DESC
+        LIMIT #{param2}, #{param3}
+    </select>
+
+    <select id="listByAllFromRow" resultMap="mapFeed">
+        <include refid="SELECT_BASE_USER_FEED"/>
+        WHERE f.feed_id IN (
+        <foreach collection="feedIdList" item="item" separator=",">
+            #{item}
+        </foreach>
+        )
+        AND f.feed_state = 'comp'
+        ORDER BY
+        feed_regdate DESC
+        LIMIT #{param2}, #{param3}
     </select>
 
     <select id="findAllCompFeedByUserId" resultMap="mapFeed">
@@ -66,36 +100,6 @@
         <include refid="SELECT_BASE_USER_FEED"/>
         WHERE feed_state = 'temp' AND f.user_id = #{userId}
         ORDER BY feed_regdate DESC
-    </select>
-
-    <select id="findAllCompFeedByNickname" resultMap="mapFeed">
-        <include refid="SELECT_BASE_USER_FEED"/>
-        WHERE nickname = #{nickname}
-        AND feed_state = 'comp'
-        ORDER BY feed_regdate DESC
-    </select>
-
-    <select id="findAllCompFeedByTag" resultMap="mapFeed">
-        <include refid="SELECT_BASE_USER_FEED"/>
-        WHERE f.feed_id IN (
-            <foreach collection="feedIdList" item="item" separator=",">
-                #{item}
-            </foreach>
-        )
-        AND f.feed_state = 'comp'
-        ORDER BY feed_regdate DESC
-    </select>
-
-    <select id="findAllCompFeedByAll" resultMap="mapFeed">
-        <include refid="SELECT_BASE_USER_FEED"/>
-        WHERE f.feed_id IN (
-            <foreach collection="feedIdList" item="item" separator=",">
-                #{item}
-            </foreach>
-        )
-        AND f.feed_state = 'comp'
-        ORDER BY
-            feed_regdate DESC
     </select>
 
     <select id="findTagsByFeedId" resultType="java.lang.String">
@@ -120,6 +124,30 @@
             feeds f, users u
         WHERE
             f.user_id = u.user_id AND u.nickname = #{keyword}
+    </select>
+
+    <select id="countAll" resultType="java.lang.Long">
+        SELECT count(*)
+        FROM feeds
+        WHERE feed_state = 'comp';
+    </select>
+
+    <select id="countAllByNickname" resultType="java.lang.Long">
+        SELECT count(*)
+        FROM feeds f, users u
+        WHERE f.user_id = u.user_id AND f.feed_state = 'comp' AND u.nickname = 'nickname';
+    </select>
+
+    <select id="countAllByTag" resultType="java.lang.Long">
+        SELECT count(*)
+        FROM feeds
+        WHERE feed_id IN (
+        <foreach collection="feedIdList" item="item" separator=",">
+            #{item}
+        </foreach>
+        )
+        AND feed_state = 'comp'
+        ORDER BY feed_regdate DESC
     </select>
 
 
