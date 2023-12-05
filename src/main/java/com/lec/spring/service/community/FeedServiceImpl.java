@@ -48,7 +48,6 @@ public class FeedServiceImpl implements FeedService {
     // feed의 모든 댓글 가져오기
     public List<CommentDTO> findCommentsByFeedId(Long feedId) {
         var list = commentRepository.findCommentsByFeedId(feedId);
-        System.out.println("comment list : " + list);
 
         // 해당 댓글의 모든 대댓글 가져오기
         list.forEach(outer -> {
@@ -164,6 +163,27 @@ public class FeedServiceImpl implements FeedService {
         return list;
     }
 
+    @Override
+    public void listByOption(String option, String keyword, Integer page, Model model) {
+        HttpSession session = U.getSession();
+        if(option == null) option = (String) session.getAttribute("searchOption");
+        else session.setAttribute("searchOption", option);
+
+        if(keyword == null) keyword = (String) session.getAttribute("keyword");
+        else session.setAttribute("keyword", keyword);
+
+        if(!keyword.isEmpty()) {
+            switch (option) {
+                case "nick" -> listByNickname(keyword, page, model);
+                case "tag" -> listByTag(keyword, page, model);
+                default -> listByAll(keyword, page, model);
+            }
+        } else {
+            session.setAttribute("searchOption", "all");
+            list(page, model);
+        }
+    }
+
 
     // 해당 Nickname을 가진 유저가 작성한 모든 피드글 가져오기
     // 추후에 완료글 리스트에서도 사용
@@ -217,7 +237,7 @@ public class FeedServiceImpl implements FeedService {
             page = 0;
         }
 
-        model.addAttribute("option", "nickname");
+        model.addAttribute("option", "nick");
         model.addAttribute("totalCnt", cnt);  // 전체 글 개수
         model.addAttribute("page", page); // 현재 페이지
         model.addAttribute("totalPage", totalPage);  // 총 '페이지' 수
@@ -382,43 +402,71 @@ public class FeedServiceImpl implements FeedService {
         return feed.get(0);
     }
 
-    @Override
-    public List<FeedDTO> findAllCompFeedByUserId(Long userId) {
-        var list =  feedRepository.findAllCompFeedByUserId(userId);
 
-        if(list != null) {
-            setShortContentPerFeed(list);
-            setTagListPerFeed(list);
+
+    @Override
+    public List<FeedDTO> listByUserId(Long userId, Integer page, Model model, String state) {
+
+        if(page == null) page = 1;  // 디폴트는 1page
+        if(page < 1) page = 1;
+
+        HttpSession session = U.getSession();
+        Integer writePages = (Integer)session.getAttribute("writePages");
+        if(writePages == null) writePages = WRITE_PAGES;  // 만약 session 에 없으면 기본값으로 동작
+        Integer pageRows = (Integer)session.getAttribute("pageRows");
+        if(pageRows == null) pageRows = PAGE_ROWS;  // 만약 session 에 없으면 기본값으로 동작
+
+        // 현재 페이지 번호 -> session 에 저장
+        session.setAttribute("page", page);
+
+        long cnt = feedRepository.countFeedByUserId(userId, state);   // 글 목록 전체의 개수
+        int totalPage = (int)Math.ceil(cnt / (double)pageRows);   // 총 몇 '페이지' ?
+
+        int startPage = 0;
+        int endPage = 0;
+
+        List<FeedDTO> list = null;
+
+        if(cnt > 0){
+            if(page > totalPage) page = totalPage;
+            int fromRow = (page - 1) * pageRows;
+
+            startPage = (((page - 1) / writePages) * writePages) + 1;
+            endPage = startPage + writePages - 1;
+            if (endPage >= totalPage) endPage = totalPage;
+
+            LocalDateTime start = LocalDateTime.now();
+            list = feedRepository.myFeedFromRow(userId, fromRow, pageRows, state);
+            if(list != null) {
+                list.forEach(feed -> {
+                    feed.setComments(findCommentsByFeedId(feed.getFeedId()));
+                });
+
+                setShortContentPerFeed(list);
+                setTagListPerFeed(list);
+            }
+            LocalDateTime end = LocalDateTime.now();
+            model.addAttribute("list", list);
+
+            Duration diff = Duration.between(start.toLocalTime(), end.toLocalTime());
+            model.addAttribute("searchTime", diff.toMillis() / 1000.00);
+        } else {
+            page = 0;
         }
+
+        model.addAttribute("totalCnt", cnt);  // 전체 글 개수
+        model.addAttribute("page", page); // 현재 페이지
+        model.addAttribute("totalPage", totalPage);  // 총 '페이지' 수
+        model.addAttribute("pageRows", pageRows);  // 한 '페이지' 에 표시할 글 개수
+
+        // [페이징]
+        model.addAttribute("url", U.getRequest().getRequestURI());  // 목록 url
+        model.addAttribute("writePages", writePages); // [페이징] 에 표시할 숫자 개수
+        model.addAttribute("startPage", startPage);  // [페이징] 에 표시할 시작 페이지
+        model.addAttribute("endPage", endPage);   // [페이징] 에 표시할 마지막 페이지
 
         return list;
     }
-
-    @Override
-    public List<FeedDTO> findAllDelFeedByUserId(Long userId) {
-        var list =  feedRepository.findAllDelFeedByUserId(userId);
-
-        if(list != null) {
-            setShortContentPerFeed(list);
-            setTagListPerFeed(list);
-        }
-
-        return list;
-    }
-
-    @Override
-    public List<FeedDTO> findAllTempFeedByUserId(Long userId) {
-        var list =  feedRepository.findAllTempFeedByUserId(userId);
-
-        if(list != null) {
-            setShortContentPerFeed(list);
-            setTagListPerFeed(list);
-        }
-
-        return list;
-    }
-
-
 
 
     // feed 추가/삭제/수정
@@ -445,6 +493,13 @@ public class FeedServiceImpl implements FeedService {
                 .build();
         feed.setUser(user);
 
+        // 임시 저장 글이고 내용이 존재하지 않는 경우에는 빈 문자열을 추가
+        if(feed.getFeedState().equals("temp")) {
+            if(feed.getFeedContent().isEmpty()) {
+                feed.setFeedContent("");
+            }
+        }
+
         // feed를 추가
         int result = feedRepository.saveFeed(feed);
 
@@ -464,27 +519,30 @@ public class FeedServiceImpl implements FeedService {
 
         Long feedId = feed.getFeedId();
         int result = 1;
+        if(!feed.getTagList().isEmpty()) {
+            // tag list 만들기
+            List<String> taglist = List.of(feed.getTagList().trim().split(","));
 
-        // tag list 만들기
-        List<String> taglist = List.of(feed.getTagList().trim().split(","));
+            for(var tag : taglist) {
+                TagDTO isExist = tagRepository.findTagByName(tag.trim());
+                Long tagId = 0L;
+                if(isExist == null) {
+                    // 새로운 tag 일 시, 저장하고 pk 값 받아오기
+                    TagDTO newTagDTO = new TagDTO();
+                    newTagDTO.setTagName(tag.trim());
+                    int success = tagRepository.addTag(newTagDTO);
 
-        for(var tag : taglist) {
-            TagDTO isExist = tagRepository.findTagByName(tag.trim());
-            Long tagId = 0L;
-            if(isExist == null) {
-                // 새로운 tag 일 시, 저장하고 pk 값 받아오기
-                TagDTO newTagDTO = new TagDTO();
-                newTagDTO.setTagName(tag.trim());
-                int success = tagRepository.addTag(newTagDTO);
+                    if(success == 1) tagId = newTagDTO.getTagId();
 
-                if(success == 1) tagId = newTagDTO.getTagId();
+                } else {
+                    tagId = isExist.getTagId();
+                }
 
-            } else {
-                tagId = isExist.getTagId();
+                result = tagRepository.addTagAndFeed(feedId, tagId);
+                if(result == 0) return result;
             }
-
-            result = tagRepository.addTagAndFeed(feedId, tagId);
-            if(result == 0) return result;
+        } else {
+            feed.setTagList("");
         }
 
         return result;
@@ -511,8 +569,8 @@ public class FeedServiceImpl implements FeedService {
 
     // 모두 삭제
     @Override
-    public int deleteFeedAllByUserId(Long userId) {
-        return feedRepository.deleteFeedAllByUesrId(userId);
+    public int deleteFeedAllByUserId(Long userId, String state) {
+        return feedRepository.deleteFeedAllByUserId(userId, state);
     }
 
     // 휴지통 보내기
@@ -566,7 +624,16 @@ public class FeedServiceImpl implements FeedService {
     // 피드 수정
     @Override
     public int updateFeed(FeedDTO feed) {
+        System.out.println("update feed : " + feed.getFeedId());
+        System.out.println("update feed tag: " + feed.getTagList());
+        System.out.println("update feedDTO : " + feed);
         int result = feedRepository.updateFeed(feed);
+
+        if(feed.getFeedState().equals("temp")) {
+            if(feed.getFeedContent().isEmpty()) {
+                feed.setFeedContent("");
+            }
+        }
 
         // 태그 수정
         if(result == 1) {
@@ -585,46 +652,50 @@ public class FeedServiceImpl implements FeedService {
         Long feedId = feed.getFeedId();
         int result = 1;
 
-        // tag list 만들기
-        List<String> taglist = List.of(feed.getTagList().trim().split(","));
+        if(!feed.getTagList().isEmpty()) {
+            // tag list 만들기
+            List<String> taglist = List.of(feed.getTagList().trim().split(","));
 
-        // 해당 태그를 기존의 feed 가 가지고 있는지 검사 => origin_tag_id_list , new_tag_id_list
-        List<Long> originTagList = tagRepository.findTagIdByFeedIDd(feedId);
-        List<Long> newTagList = new ArrayList<>();
-        for(var tag : taglist) {
-            // tag 의 id 값 가져오기
-            TagDTO isExist = tagRepository.findTagByName(tag.trim());
-            Long tagId = 0L;
-            if(isExist == null) {
-                // 새로운 tag 일 시, 저장하고 pk 값 받아오기
-                TagDTO newTagDTO = new TagDTO();
-                newTagDTO.setTagName(tag.trim());
-                int success = tagRepository.addTag(newTagDTO);
+            // 해당 태그를 기존의 feed 가 가지고 있는지 검사 => origin_tag_id_list , new_tag_id_list
+            List<Long> originTagList = tagRepository.findTagIdByFeedIDd(feedId);
+            List<Long> newTagList = new ArrayList<>();
+            for (var tag : taglist) {
+                // tag 의 id 값 가져오기
+                TagDTO isExist = tagRepository.findTagByName(tag.trim());
+                Long tagId = 0L;
+                if (isExist == null) {
+                    // 새로운 tag 일 시, 저장하고 pk 값 받아오기
+                    TagDTO newTagDTO = new TagDTO();
+                    newTagDTO.setTagName(tag.trim());
+                    int success = tagRepository.addTag(newTagDTO);
 
-                if(success == 1) tagId = newTagDTO.getTagId();
+                    if (success == 1) tagId = newTagDTO.getTagId();
 
-            } else {
-                tagId = isExist.getTagId();
+                } else {
+                    tagId = isExist.getTagId();
+                }
+
+                newTagList.add(tagId);
             }
 
-            newTagList.add(tagId);
-        }
-
-        // 비교 들가자
-        // origin 태그의 new 태그가 없으면? 추가
-        for(var id : newTagList) {
-            if(!originTagList.contains(id)){
-                result = tagRepository.addTagAndFeed(feedId, id);
-                if(result == 0) return 0;
+            // 비교 들가자
+            // origin 태그의 new 태그가 없으면? 추가
+            for (var id : newTagList) {
+                if (!originTagList.contains(id)) {
+                    result = tagRepository.addTagAndFeed(feedId, id);
+                    if (result == 0) return 0;
+                }
             }
-        }
 
-        // new 태그의 origin 태그가 없으면? 삭제
-        for(var id : originTagList) {
-            if(!newTagList.contains(id)){
-                result = tagRepository.deleteTagAndFeed(feedId, id);
-                if(result == 0) return 0;
+            // new 태그의 origin 태그가 없으면? 삭제
+            for (var id : originTagList) {
+                if (!newTagList.contains(id)) {
+                    result = tagRepository.deleteTagAndFeed(feedId, id);
+                    if (result == 0) return 0;
+                }
             }
+        } else {
+            feed.setTagList("");
         }
 
         return result;

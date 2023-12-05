@@ -48,13 +48,12 @@ VALUES (1, 'title1', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
        (1, 'title2', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi beatae corporis dignissimos dolores dolorum id incidunt ipsa ipsam iure maiores, minima, nobis perferendis perspiciatis provident sint veniam vitae! Eum, voluptatibus.', 'temp'),
        (1, 'title3', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi beatae corporis dignissimos dolores dolorum id incidunt ipsa ipsam iure maiores, minima, nobis perferendis perspiciatis provident sint veniam vitae! Eum, voluptatibus.', 'comp'),
        (2, 'title4', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi beatae corporis dignissimos dolores dolorum id incidunt ipsa ipsam iure maiores, minima, nobis perferendis perspiciatis provident sint veniam vitae! Eum, voluptatibus.', 'comp'),
-       (3, 'title5', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi beatae corporis dignissimos dolores dolorum id incidunt ipsa ipsam iure maiores, minima, nobis perferendis perspiciatis provident sint veniam vitae! Eum, voluptatibus.', 'del'),
+       (1, 'title5', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi beatae corporis dignissimos dolores dolorum id incidunt ipsa ipsam iure maiores, minima, nobis perferendis perspiciatis provident sint veniam vitae! Eum, voluptatibus.', 'del'),
        (1, 'title1', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi beatae corporis dignissimos dolores dolorum id incidunt ipsa ipsam iure maiores, minima, nobis perferendis perspiciatis provident sint veniam vitae! Eum, voluptatibus.', 'comp'),
        (1, 'title2', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi beatae corporis dignissimos dolores dolorum id incidunt ipsa ipsam iure maiores, minima, nobis perferendis perspiciatis provident sint veniam vitae! Eum, voluptatibus.', 'temp'),
        (1, 'title3', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi beatae corporis dignissimos dolores dolorum id incidunt ipsa ipsam iure maiores, minima, nobis perferendis perspiciatis provident sint veniam vitae! Eum, voluptatibus.', 'comp'),
        (2, 'title4', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi beatae corporis dignissimos dolores dolorum id incidunt ipsa ipsam iure maiores, minima, nobis perferendis perspiciatis provident sint veniam vitae! Eum, voluptatibus.', 'comp'),
-       (3, 'title5', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi beatae corporis dignissimos dolores dolorum id incidunt ipsa ipsam iure maiores, minima, nobis perferendis perspiciatis provident sint veniam vitae! Eum, voluptatibus.', 'del');
-
+       (1, 'title5', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi beatae corporis dignissimos dolores dolorum id incidunt ipsa ipsam iure maiores, minima, nobis perferendis perspiciatis provident sint veniam vitae! Eum, voluptatibus.', 'del');
 
 
 

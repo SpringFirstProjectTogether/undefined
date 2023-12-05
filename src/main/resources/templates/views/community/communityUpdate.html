@@ -146,26 +146,29 @@
                     <div class="card-body">
                         <form method="post" th:action="@{/community/update}" enctype="multipart/form-data" class="writeForm">
                             <fieldset>
+                                <input type="hidden" name="feedId" th:value="${feed.feedId}"/>
                                 <legend th:text="${feed.user.nickname}">Nickname</legend>
                                 <div class="form-group">
                                     <label class="col-form-label mt-0" for="feedTitle">Title</label>
                                     <input type="text" class="form-control"
-                                           placeholder="Title ( maximum : 20 words )" id="feedTitle" th:value="${feed.feedTitle}">
+                                           placeholder="Title ( maximum : 20 words )" name="feedTitle" id="feedTitle" th:value="${feedTitle} ? ${feedTitle} : ${feed.feedTitle}">
+                                    <span class="text-danger" th:if="${error_feedTitle}" th:utext="${error_feedTitle}"></span>
                                 </div>
 
 
                                 <!--resize js 에서 구현-->
                                 <div class="form-group">
                                     <label for="feedContent" class="form-label mt-4">Content</label>
-                                    <textarea class="form-control" id="feedContent" rows="10"
-                                              placeholder="Enter the content. ( maximum : 500 words )" th:text="${feed.feedContent}"></textarea>
+                                    <textarea class="form-control" name="feedContent" id="feedContent" rows="10"
+                                              placeholder="Enter the content. ( maximum : 500 words )" th:text="${feedContent} ? ${feedContent} : ${feed.feedContent}"></textarea>
                                 </div>
+                                <span class="text-danger" th:if="${error_feedContent}" th:utext="${error_feedContent}"></span>
 
 
                                 <div class="form-group">
                                     <label class="col-form-label mt-4" for="feedTag">Tag</label>
                                     <input type="text" class="form-control"
-                                           placeholder="Input tags. The delemeter of tags is comma ( , )" id="feedTag" th:value="${feed.tagList}">
+                                           placeholder="Input tags. The delemeter of tags is comma ( , )" id="feedTag" name="tagList" th:value="${tagList} ? ${tagList} : ${feed.tagList}">
                                 </div>
 
 
@@ -203,12 +206,16 @@
                                     </div>
                                 </div>
 
-                                <input type="text" id="feedState" style="display: none"/>
+                                <input type="text" name="feedState" id="feedState" th:value="${feed.feedState}" style="display: none"/>
 
                             </fieldset>
                         </form>
 
                         <div class="mt-5 ms-2">
+                            <th:block th:if="${feed.feedState == 'temp'}">
+                                <button type="button" class="btn btn-outline-secondary col-sm-3 col-md-2 float-right tempBtn"
+                                        style="font-size: 0.8em;">임시저장</button>
+                            </th:block>
                             <button type="button" class="btn btn-outline-success col-sm-2 float-right compBtn"
                                     style="font-size: 0.8em;">확인</button>
                             <button type="button" class="btn btn-outline-danger col-sm-2 float-right cancelBtn"

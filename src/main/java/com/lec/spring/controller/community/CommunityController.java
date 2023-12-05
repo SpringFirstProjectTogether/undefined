@@ -1,10 +1,15 @@
 package com.lec.spring.controller.community;
 
 import com.lec.spring.domain.community.FeedDTO;
+import com.lec.spring.domain.community.FeedValidator;
 import com.lec.spring.service.community.FeedService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -26,23 +31,15 @@ public class CommunityController {
         return "community/communityMainPage";
     }
 
-    @GetMapping("/search")
+    @RequestMapping("/search")
     public String search(
-            @RequestParam String searchOption
-            , @RequestParam String keyword
+            String searchOption
+            , String keyword
             , Integer page
             , Model model
     ) {
 
-        if(!keyword.isEmpty()) {
-            switch (searchOption) {
-                case "nick" -> feedService.listByNickname(keyword, page, model);
-                case "tag" -> feedService.listByTag(keyword, page, model);
-                default -> feedService.listByAll(keyword, page, model);
-            }
-        } else {
-            feedService.list(page, model);
-        }
+        feedService.listByOption(searchOption, keyword, page, model);
 
         return "community/communityMainPage";
     }
@@ -55,24 +52,24 @@ public class CommunityController {
     @PostMapping("/write")
     public String writeOk(
 //            @RequestParam Map<String, MultipartFile> files   // 첨부 파일
-//            , BindingResult result
-            FeedDTO feed
+            @Valid FeedDTO feed
+            ,BindingResult result
             , Model model   // 매개변수 선언시 BindingResult 보다 Model 을 뒤에 두어야 한다.
-//            , RedirectAttributes redirectAttrs
+            , RedirectAttributes redirectAttrs
     ){
         // validation 에러가 있었다면 redirect 할거다!
-//        if(result.hasErrors()){
-//            redirectAttrs.addFlashAttribute("subject", post.getSubject());
-//            redirectAttrs.addFlashAttribute("content", post.getContent());
-//
-//            for(var err : result.getFieldErrors()){
-//                redirectAttrs.addFlashAttribute("error_" + err.getField(), err.getCode());
-//            }
-//
-//            return "redirect:/board/write";
-//        }
+        if(result.hasErrors()){
+            redirectAttrs.addFlashAttribute("feedTitle", feed.getFeedTitle());
+            redirectAttrs.addFlashAttribute("feedContent", feed.getFeedContent());
+            redirectAttrs.addFlashAttribute("tagList", feed.getTagList());
 
-        // add 할 때 어떤 작업이 필요??
+            for(var err : result.getFieldErrors()){
+                redirectAttrs.addFlashAttribute("error_" + err.getField(), err.getCode());
+            }
+
+            return "redirect:/community/write";
+        }
+
         model.addAttribute("result", feedService.writeFeed(feed));
 
         if(feed.getFeedState().equals("comp"))
@@ -93,6 +90,7 @@ public class CommunityController {
             feed.setTagList(feed.getTagList().replaceAll(" #", ", ").substring(1));
 
         model.addAttribute("feed", feed);
+        System.out.println("feed state : " + feed.getFeedState());
 
         return "community/communityUpdate";
     }
@@ -101,27 +99,31 @@ public class CommunityController {
     public String updateOk(
 //            @RequestParam Map<String, MultipartFile> files  // 새로 추가될 첨부파일들
 //            , Long[] delfile    // 삭제될 파일들
-//            , @Valid Post post
-//            , BindingResult result
-            FeedDTO feed
+            @Valid  FeedDTO feed
+            , BindingResult result
             , Model model
-//            , RedirectAttributes redirectAttrs
+            , RedirectAttributes redirectAttrs
     ){
-//        if(result.hasErrors()){
-//
-//            redirectAttrs.addFlashAttribute("subject", post.getSubject());
-//            redirectAttrs.addFlashAttribute("content", post.getContent());
-//
-//            for(var err : result.getFieldErrors()){
-//                redirectAttrs.addFlashAttribute("error_" + err.getField(), err.getCode());
-//            }
-//
-//            return "redirect:/board/update/" + post.getId();
-//        }
+        if(result.hasErrors()){
+
+            redirectAttrs.addFlashAttribute("feedTitle", feed.getFeedTitle());
+            redirectAttrs.addFlashAttribute("feedContent", feed.getFeedContent());
+            redirectAttrs.addFlashAttribute("tagList", feed.getTagList());
+
+            for(var err : result.getFieldErrors()){
+                redirectAttrs.addFlashAttribute("error_" + err.getField(), err.getCode());
+            }
+
+            return "redirect:/community/update/" + feed.getFeedId();
+        }
 
 
         model.addAttribute("result", feedService.updateFeed(feed));
-        return "community/communityUpdateOk";
+
+        if(feed.getFeedState().equals("comp"))
+            return "community/communityUpdateOk";
+
+        return "community/communityTempUpdateOk";
     }
 
     @PostMapping("/delete")
@@ -133,6 +135,11 @@ public class CommunityController {
         model.addAttribute("result", result);
 
         return "community/communityDeleteOk";
+    }
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.setValidator(new FeedValidator());
     }
 
 

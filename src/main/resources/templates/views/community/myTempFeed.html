@@ -31,6 +31,10 @@
         #menubar::-webkit-scrollbar {
             display: none;
         }
+
+        button, .cursor-pointer {
+            cursor: pointer;
+        }
     </style>
 
 </head>
@@ -268,68 +272,67 @@
                                     </div>
 
                                 </div>
+                                <div class="accordion-collapse collapse hidden" th:id="${'Collapse' + feed.feedId}">
+                                    <hr>
+                                    <div class="accordion-body overflow-auto scrollbar"
+                                         style="height: auto; max-height: 200px;" th:if="${feed.comments}">
+                                        <div th:each="comment : ${feed.comments}">
+                                            <div>
+                                                <span style="font-size: 0.9em" th:text="${comment.user.nickname}">Nickname</span>
+                                                <br>
+                                                <span style="font-size: 0.8em" th:text="${comment.commentContent}">comment</span>
 
-                                <script th:inline="javascript">
-                                    if (document.body.querySelector(`.more[[${feed.feedId}]]`) != null) {
-                                        document.body.querySelector(`.more[[${feed.feedId}]]`).addEventListener('click', () => {
-                                            const content = document.body.querySelector(`.feedText[[${feed.feedId}]]`);
-                                            let text = content.innerHTML;
+                                            </div>
+                                            <div class="ms-4"><!-- 대댓글 -->
+                                                <div th:each="reply: ${comment.replyDTOList}">
+                                                    <div>
+                                                        <span style="font-size: 0.9em" th:text="${reply.user.nickname}">Nickname</span>
+                                                        <br>
+                                                        <span style="font-size: 0.8em" th:text="${reply.replyContent}">comment</span>
 
-                                            if (text.length > 100) {
-                                                content.innerHTML = [[${ feed.shortContent }]];
-                                                document.body.querySelector(`.more[[${feed.feedId}]] > p`).innerHTML = 'more...';
-                                            } else {
-                                                content.innerHTML = [[${ feed.feedContent }]];
-                                                document.body.querySelector(`.more[[${feed.feedId}]] > p`).innerHTML = 'less...';
-                                            }
-                                        });
-                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                    document.body.querySelector(`#editBtn[[${feed.feedId}]]`).addEventListener('click', () => {
-                                        document.body.querySelector(`#formEdit[[${feed.feedId}]]`).submit();
-                                    });
-
-                                    document.body.querySelector(`#deleteBtn[[${feed.feedId}]]`).addEventListener('click', () => {
-                                        if (confirm("해당 피드글을 삭제하시겠습니까?")) {
-                                            document.body.querySelector(`#formDelete[[${feed.feedId}]]`).submit();
-                                        }
-                                    });
-
-                                </script>
+                                    </div>
+                                </div>
                             </div>
 
                         </div>
                     </div>
+                    <script th:inline="javascript">
+                        if (document.body.querySelector(`.more[[${feed.feedId}]]`) != null) {
+                            document.body.querySelector(`.more[[${feed.feedId}]]`).addEventListener('click', () => {
+                                const content = document.body.querySelector(`.feedText[[${feed.feedId}]]`);
+                                let text = content.innerHTML;
+
+                                if (text.length > 100) {
+                                    content.innerHTML = [[${ feed.shortContent }]];
+                                    document.body.querySelector(`.more[[${feed.feedId}]] > p`).innerHTML = 'more...';
+                                } else {
+                                    content.innerHTML = [[${ feed.feedContent }]];
+                                    document.body.querySelector(`.more[[${feed.feedId}]] > p`).innerHTML = 'less...';
+                                }
+                            });
+                        }
+
+                        document.body.querySelector(`#editBtn[[${feed.feedId}]]`).addEventListener('click', () => {
+                            document.body.querySelector(`#formEdit[[${feed.feedId}]]`).submit();
+                        });
+
+                        document.body.querySelector(`#deleteBtn[[${feed.feedId}]]`).addEventListener('click', () => {
+                            if (confirm("해당 피드글을 삭제하시겠습니까?")) {
+                                document.body.querySelector(`#formDelete[[${feed.feedId}]]`).submit();
+                            }
+                        });
+
+                    </script>
                 </div>
 
-                <!--pagingnation-->
-                <section class="d-flex justify-content-center mt-1">
-                    <div>
-                        <ul class="pagination pagination-sm">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#">&laquo;</a>
-                            </li>
-                            <li class="page-item active">
-                                <a class="page-link" href="#">1</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">2</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">3</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">4</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">5</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">&raquo;</a>
-                            </li>
-                        </ul>
-                    </div>
-                </section>
+                <!-- pagination -->
+                <th:block th:insert="~{community/pagination::pagination}"></th:block>
+                <!-- pagination -->
             </div>
         </main>
         <footer class="py-4 bg-light mt-auto">
@@ -350,8 +353,6 @@
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/myTempFeed.js"></script>
 <script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
-<script src="/assets/demo/chart-area-demo.js"></script>
-<script src="/assets/demo/chart-bar-demo.js"></script>
 <script crossorigin="anonymous"
         src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"></script>
 </body>

@@ -19,7 +19,7 @@ window.addEventListener('DOMContentLoaded', event => {
     allDelete.addEventListener('click', () => {
         console.log("click~!~!~!")
         if(confirm("휴지통을 비우시겠습니까?")) {
-            location.href='deleteAll';
+            location.href='/trash/deleteAll';
         }
     })
 

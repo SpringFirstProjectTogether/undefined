@@ -18,10 +18,17 @@ window.addEventListener('DOMContentLoaded', event => {
     const frm = document.body.querySelector('.writeForm');
     const compBtn = document.body.querySelector('.compBtn');
     compBtn.addEventListener('click', () => {
-        if(confirm("해당 피드를 수정하시겠습니까??")){
+        document.querySelector('#feedState').setAttribute('value', 'comp');
+        if(confirm("해당 피드를 수정하시겠습니까??(임시 저장 글의 경우, 피드 글이 게시됩니다)")){
             frm.submit();
         }
     })
+
+    const tempBtn = document.body.querySelector('.tempBtn');
+    tempBtn.addEventListener('click', () => {
+        document.querySelector('#feedState').setAttribute('value', 'temp');
+        frm.submit();
+    });
 
     const cancelBtn = document.body.querySelector('.cancelBtn');
     cancelBtn.addEventListener('click', () => {

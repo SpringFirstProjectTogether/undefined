@@ -84,15 +84,16 @@
         LIMIT #{param2}, #{param3}
     </select>
 
+    <select id="myFeedFromRow" resultMap="mapFeed">
+        <include refid="SELECT_BASE_USER_FEED"/>
+        WHERE feed_state = #{state} AND f.user_id = #{userId}
+        ORDER BY feed_regdate DESC
+        LIMIT #{param2}, #{param3}
+    </select>
+
     <select id="findAllCompFeedByUserId" resultMap="mapFeed">
         <include refid="SELECT_BASE_USER_FEED"/>
         WHERE feed_state = 'comp' AND f.user_id = #{userId}
-        ORDER BY feed_regdate DESC
-    </select>
-
-    <select id="findAllDelFeedByUserId" resultMap="mapFeed">
-        <include refid="SELECT_BASE_USER_FEED"/>
-        WHERE feed_state = 'del' AND f.user_id = #{userId}
         ORDER BY feed_regdate DESC
     </select>
 
@@ -135,14 +136,14 @@
     <select id="countAllByNickname" resultType="java.lang.Long">
         SELECT count(*)
         FROM feeds f, users u
-        WHERE f.user_id = u.user_id AND f.feed_state = 'comp' AND u.nickname = 'nickname';
+        WHERE f.user_id = u.user_id AND f.feed_state = 'comp' AND u.nickname = #{nickname};
     </select>
 
     <select id="countAllByTag" resultType="java.lang.Long">
         SELECT count(*)
         FROM feeds
         WHERE feed_id IN (
-        <foreach collection="feedIdList" item="item" separator=",">
+        <foreach collection="list" item="item" separator=",">
             #{item}
         </foreach>
         )
@@ -150,7 +151,12 @@
         ORDER BY feed_regdate DESC
     </select>
 
-
+    <select id="countFeedByUserId" resultType="java.lang.Long">
+        SELECT count(*)
+        FROM feeds f, users u
+        WHERE f.user_id = u.user_id AND u.user_id = #{userId} AND f.feed_state = #{state}
+        ORDER BY feed_regdate DESC
+    </select>
 
     <insert id="saveFeed" flushCache="true" useGeneratedKeys="true" keyColumn="feed_id" keyProperty="feedId" parameterType="com.lec.spring.domain.community.FeedDTO">
         INSERT INTO feeds (user_id, feed_title, feed_content, feed_state)
@@ -161,8 +167,8 @@
         DELETE FROM feeds WHERE feed_id = #{feedId}
     </delete>
 
-    <delete id="deleteFeedAllByUesrId">
-        DELETE FROM feeds WHERE feed_state = 'del' AND user_id = #{userId}
+    <delete id="deleteFeedAllByUserId" flushCache="true">
+        DELETE FROM feeds WHERE feed_state = #{state} AND user_id = #{userId}
     </delete>
 
     <update id="updateFeed" flushCache="true" parameterType="com.lec.spring.domain.community.FeedDTO">

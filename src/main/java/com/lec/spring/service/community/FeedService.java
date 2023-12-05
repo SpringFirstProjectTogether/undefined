@@ -10,27 +10,13 @@ import java.util.List;
 public interface FeedService {
 
     int writeFeed(FeedDTO feed);
-
     int deleteFeed(Long feedId);
-
     int updateFeed(FeedDTO feed);
-
     int trashFeed(Long feedId);
-
     FeedDTO findFeedById(Long id);
-
-    List<FeedDTO> findAllCompFeedByUserId(Long userId);
-
     int trashFeedAllByUserId(Long userId);
-
-    List<FeedDTO> findAllDelFeedByUserId(Long userId);
-
-    int deleteFeedAllByUserId(Long userId);
-
+    int deleteFeedAllByUserId(Long userId, String state);
     int restoreFeed(Long feedId);
-
-    List<FeedDTO> findAllTempFeedByUserId(Long userId);
-
 
 
     // 리스트 함수
@@ -38,4 +24,8 @@ public interface FeedService {
     List<FeedDTO> listByNickname(String nickname, Integer page, Model model);
     List<FeedDTO> listByTag(String nickname, Integer page, Model model);
     List<FeedDTO> listByAll(String keyword, Integer page, Model model);
+    void listByOption(String option, String keyword, Integer page, Model model);
+
+    // User Id 별 리스트 함수
+    List<FeedDTO> listByUserId(Long userId, Integer page, Model model, String state);
 }

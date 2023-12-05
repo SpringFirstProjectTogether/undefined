@@ -2,14 +2,14 @@
 <html lang="ko" xmlns:th="https://www.thymeleaf.org">
 
 <head>
-    <meta charset="utf-8" />
-    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
-    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport" />
-    <meta content="" name="description" />
-    <meta content="" name="author" />
+    <meta charset="utf-8"/>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+    <meta content="" name="description"/>
+    <meta content="" name="author"/>
     <title>Community Main Page</title>
-    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
-    <link href="/css/styles.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet"/>
+    <link href="/css/styles.css" rel="stylesheet"/>
     <script crossorigin="anonymous" src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/sketchy/bootstrap.min.css" rel="stylesheet">
 
@@ -31,6 +31,10 @@
         #menubar::-webkit-scrollbar {
             display: none;
         }
+
+        button, .cursor-pointer {
+            cursor: pointer;
+        }
     </style>
 
 </head>
@@ -50,7 +54,7 @@
             <ul aria-labelledby="navbarDropdown" class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" href="#!">Profile</a></li>
                 <li>
-                    <hr class="dropdown-divider" />
+                    <hr class="dropdown-divider"/>
                 </li>
                 <li><a class="dropdown-item" href="#!">Login</a></li>
             </ul>
@@ -173,7 +177,9 @@
                         <p class="col-9">공개된 피드 수 : <span th:text="${totalCnt}">0</span> 개</p>
                         <!-- 전체 삭제 버튼 -->
                         <div class="text-end col-3">
-                            <button class="btn btn-outline-danger mb-2 deleteAll" style="font-size: 0.7em; line-height: 15px;">전체 삭제</button>
+                            <button class="btn btn-outline-danger mb-2 deleteAll"
+                                    style="font-size: 0.7em; line-height: 15px;">전체 삭제
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -187,7 +193,7 @@
                                     <h3 class="text-start col-9 col-sm-8 pt-2" th:text="${feed.user.nickname}">
                                         Nickname</h3>
                                     <p class="text-end col-3 col-sm-4 pt-3" style="font-size: 0.9em;"
-                                       th:text="${#dates.format(feed.feedRegdate, 'yyyy.MM.dd hh:mm')}">
+                                       th:text="${#dates.format(feed.feedRegdate, 'yyyy.MM.dd HH:mm')}">
                                         2020.03.12
                                     </p>
                                 </div>
@@ -272,201 +278,164 @@
                                 <div class="accordion-collapse collapse hidden" th:id="${'Collapse' + feed.feedId}">
                                     <hr>
                                     <div class="accordion-body overflow-auto scrollbar"
-                                         style="height: auto; max-height: 150px;" th:if="${feed.comments}">
+                                         style="height: auto; max-height: 200px;" th:if="${feed.comments}">
                                         <div th:each="comment : ${feed.comments}">
-                                            <p>
-                                                    <span class="fs-5" th:text="${comment.user.nickname}">Nickname
-                                                        <form class="visually-hidden" method="post"
-                                                              th:action="@{/comment/delete}"
-                                                              th:id="${'commentDel' + comment.commentId}">
-                                                            <input name="replyId" th:value="${comment.commentId}"
-                                                                   type="hidden" />
-                                                        </form>
-                                                        <span class="text-danger"
-                                                              th:id="${'commentDelBtn' + comment.commentId}">&nbsp;&nbsp;X</span>
-                                                    </span>
+                                            <div>
+                                                <span style="font-size: 0.9em" th:text="${comment.user.nickname}">Nickname</span><span
+                                                    class="text-danger cursor-pointer"
+                                                    th:id="${'commentDelBtn' + comment.commentId}">&nbsp;&nbsp;X</span>
+                                                <br>
+                                                <span style="font-size: 0.8em" th:text="${comment.commentContent}">comment</span>
+                                                <form class="visually-hidden" method="post"
+                                                      th:action="@{/comment/delete}"
+                                                      th:id="${'commentDel' + comment.commentId}">
+                                                    <input name="commentId" th:value="${comment.commentId}"
+                                                           type="hidden"/>
+                                                </form>
                                                 <script th:inline="javascript">
                                                     document.querySelector(`#commentDelBtn[[${comment.commentId}]]`).addEventListener('click', () => {
                                                         document.querySelector(`#commentDel[[${comment.commentId}]]`).submit();
                                                     })
 
                                                 </script>
-                                                <br>
-                                                >&nbsp;<span class="fs-6"
-                                                             th:text="${comment.commentContent}">comment</span>
-                                            </p>
-                                            <div class="ms-4">
+
+                                            </div>
+                                            <div class="ms-4"><!-- 대댓글 -->
                                                 <div th:each="reply: ${comment.replyDTOList}">
-                                                    <p>
-                                                            <span class="fs-5" th:text="${reply.user.nickname}">Nickname
-                                                                <form class="visually-hidden" method="post"
-                                                                      th:action="@{/reply/delete}"
-                                                                      th:id="${'replyDel' + reply.replyId}">
-                                                                    <input name="replyId" th:value="${reply.replyId}"
-                                                                           type="hidden" />
-                                                                </form>
-                                                                <span class="text-danger"
-                                                                      th:id="${'replyDelBtn' + reply.replyId}">&nbsp;&nbsp;X</span>
-                                                            </span>
+                                                    <div>
+                                                        <span style="font-size: 0.9em" th:text="${reply.user.nickname}">Nickname</span><span
+                                                            class="text-danger cursor-pointer"
+                                                            th:id="${'replyDelBtn' + reply.replyId}">&nbsp;&nbsp;X</span>
+                                                        <br>
+                                                        <span style="font-size: 0.8em" th:text="${reply.replyContent}">comment</span>
+                                                        <form class="visually-hidden" method="post"
+                                                              th:action="@{/reply/delete}"
+                                                              th:id="${'replyDel' + reply.replyId}">
+                                                            <input name="replyId" th:value="${reply.replyId}"
+                                                                   type="hidden"/>
+                                                        </form>
+
                                                         <script th:inline="javascript">
                                                             document.querySelector(`#replyDelBtn[[${reply.replyId}]]`).addEventListener('click', () => {
                                                                 document.querySelector(`#replyDel[[${reply.replyId}]]`).submit();
                                                             })
-
                                                         </script>
-                                                        <br>
-                                                        >&nbsp;<span class="fs-6"
-                                                                     th:text="${reply.replyContent}">comment</span>
-                                                    </p>
+
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="text-muted mt-0" th:id="${'reply' + comment.commentId}"
+                                            <div class="text-muted mt-0 cursor-pointer" style="font-size: 0.8em"
+                                                 th:id="${'reply' + comment.commentId}"
                                                  th:if="${comment}">답글달기
                                             </div>
                                             <form class="visually-hidden" method="post" th:action="@{/reply/write}"
                                                   th:id="${'replyFrm' + comment.commentId}">
-                                                <input name="parentId" th:value="${comment.commentId}"
-                                                       type="hidden" />
-                                                <input name="feedId" th:value="${feed.feedId}" type="hidden" />
-                                                <textarea class="col-11 ms-2" name="content"
-                                                          placeholder="Enter the your reply" row=2>
-                                                </textarea>
-                                                <div class="row ms-2" style="font-size: 0.8em;">
-                                                    <div class="text-muted mt-0 col-sm-3 col-md-2"
-                                                         th:id="${'addReply' + comment.commentId }">답글 등록
-                                                    </div>
-                                                    <div class="text-danger mt-0 col-sm-2"
-                                                         th:id="${'cancelReply' + comment.commentId }">취소
-                                                    </div>
-                                                </div>
+                                                <input name="parentId" th:value="${comment.commentId}" type="hidden"/>
+                                                <input name="feedId" th:value="${feed.feedId}" type="hidden"/>
+                                                <input name="content" th:id="${'replyContent' + comment.commentId}"
+                                                       type="hidden"/>
                                                 <script th:inline="javascript">
-                                                    document.querySelector(`#reply[[${comment.commentId}]]`).addEventListener('click', (e) => {
-                                                        const re = document.getElementById(`reply[[${comment.commentId}]]`);
-                                                        re.classList.add('visually-hidden');
-                                                        re.nextElementSibling.classList.remove('visually-hidden')
-                                                    })
-
-                                                    document.querySelector(`#addReply[[${comment.commentId}]]`).addEventListener('click', (e) => {
-                                                        document.getElementById(`replyFrm[[${comment.commentId}]]`).submit();
-                                                        const re = document.getElementById(`reply[[${comment.commentId}]]`);
+                                                    document.querySelector(`#reply[[${comment.commentId}]]`).addEventListener('click', () => {
+                                                        const re = document.getElementById(`isReply[[${feed.feedId}]]`);
                                                         re.classList.remove('visually-hidden');
-                                                        re.nextElementSibling.classList.add('visually-hidden')
-                                                    })
+                                                        const comment = [[${comment.commentContent}]];
+                                                        document.getElementById(`showRoute[[${feed.feedId}]]`).innerHTML = `[[${comment.user.nickname}]] : ${comment.substr(0, 10)}...에 대한 답글 작성 중...`;
+                                                        document.getElementById(`placehold[[${feed.feedId}]]`).placeholder = `답글을 작성하시오.`;
 
-                                                    document.querySelector('#cancelReply1').addEventListener('click', (e) => {
-                                                        const re = document.getElementById(`reply[[${comment.commentId}]]`);
-                                                        re.classList.remove('visually-hidden');
-                                                        re.nextElementSibling.classList.add('visually-hidden')
-                                                    })
+                                                        document.getElementById(`changeComment[[${feed.feedId}]]`).addEventListener('click', () => {
+                                                            re.classList.add('visually-hidden');
+                                                            document.getElementById(`placehold[[${feed.feedId}]]`).placeholder = `댓글 작성하시오.`;
+                                                        })
 
+                                                        document.querySelector(`#addComment[[${feed.feedId}]]`).addEventListener('click', (e) => {
+                                                            if (!document.getElementById(`isReply[[${feed.feedId}]]`).classList.contains('visually-hidden')) { // comment
+                                                                document.getElementById(`replyContent[[${comment.commentId}]]`).value = document.getElementById(`placehold[[${feed.feedId}]]`).value;
+                                                                document.getElementById(`replyFrm[[${comment.commentId}]]`).submit();
+                                                            }
+                                                        })
+
+                                                    })
                                                 </script>
                                             </form>
                                             <br>
                                         </div>
-
                                     </div>
                                     <br>
-                                    <div class="text-muted mt-0" th:id="${'comment' + feed.feedId}">댓글달기</div>
-                                    <form class="visually-hidden" method="post" th:action="@{/comment/write}"
+                                    <form method="post" th:action="@{/comment/write}"
                                           th:id="${'commentFrm' + feed.feedId}">
-                                        <input name="feedId" th:value="${feed.feedId}" type="hidden" />
-                                        <textarea class="col-11 ms-2" name="content"
-                                                  placeholder="Enter the your reply" row=2>
-                                                </textarea>
-                                        <div class="row ms-2" style="font-size: 0.8em;">
-                                            <div class="text-muted mt-0 col-sm-3 col-md-2"
-                                                 th:id="${'addComment' + feed.feedId }">등록
-                                            </div>
-                                            <div class="text-danger mt-0 col-sm-2"
-                                                 th:id="${'cancelComment' + feed.feedId }">취소
+                                        <input name="feedId" th:value="${feed.feedId}" type="hidden"/>
+
+                                        <div class="row visually-hidden" th:id="${'isReply' + feed.feedId}">
+                                            <div class="col-10" th:id="${'showRoute' + feed.feedId}"></div>
+                                            <div class="col-2"><i class="fa-solid fa-xmark fa-xs cursor-pointer"
+                                                                  th:id="${'changeComment' + feed.feedId}"></i>
                                             </div>
                                         </div>
-                                        <script th:inline="javascript">
-                                            document.querySelector(`#comment[[${feed.feedId}]]`).addEventListener('click', (e) => {
-                                                const re = document.getElementById(`comment[[${feed.feedId}]]`);
-                                                re.classList.add('visually-hidden');
-                                                re.nextElementSibling.classList.remove('visually-hidden')
-                                            })
 
-                                            document.querySelector(`#addComment[[${feed.feedId}]]`).addEventListener('click', (e) => {
-                                                document.getElementById(`commentFrm[[${feed.feedId}]]`).submit();
-                                                const re = document.getElementById(`comment[[${feed.feedId}]]`);
-                                                re.classList.remove('visually-hidden');
-                                                re.nextElementSibling.classList.add('visually-hidden')
-                                            })
-
-                                            document.querySelector(`#cancelComment[[${feed.feedId}]]`).addEventListener('click', (e) => {
-                                                const re = document.getElementById(`comment[[${feed.feedId}]]`);
-                                                re.classList.remove('visually-hidden');
-                                                re.nextElementSibling.classList.add('visually-hidden')
-                                            })
-
-                                        </script>
+                                        <textarea class="col-12" name="content" placeholder="댓글을 작성하시오."
+                                                  rows=2
+                                                  th:id="${'placehold' + feed.feedId}"></textarea>
+                                        <div>
+                                            <span class="text-primary cursor-pointer" style="font-size: 0.8em;"
+                                                  th:id="${'addComment' + feed.feedId }">등록
+                                            </span>
+                                            <span class="text-danger ms-1 cursor-pointer" style="font-size: 0.8em;"
+                                                  th:id="${'cancelComment' + feed.feedId }">지우기
+                                            </span>
+                                        </div>
                                     </form>
-                                </div>
+                                    <script th:inline="javascript">
 
-                                <script th:inline="javascript">
-                                    if (document.body.querySelector(`.more[[${feed.feedId}]]`) != null) {
-                                        document.body.querySelector(`.more[[${feed.feedId}]]`).addEventListener('click', () => {
-                                            const content = document.body.querySelector(`.feedText[[${feed.feedId}]]`);
-                                            let text = content.innerHTML;
-
-                                            if (text.length > 100) {
-                                                content.innerHTML = [[${ feed.shortContent }]];
-                                                document.body.querySelector(`.more[[${feed.feedId}]] > p`).innerHTML = 'more...';
-                                            } else {
-                                                content.innerHTML = [[${ feed.feedContent }]];
-                                                document.body.querySelector(`.more[[${feed.feedId}]] > p`).innerHTML = 'less...';
+                                        document.querySelector(`#addComment[[${feed.feedId}]]`).addEventListener('click', (e) => {
+                                            if (document.getElementById(`isReply[[${feed.feedId}]]`).classList.contains('visually-hidden')) { // comment
+                                                document.getElementById(`commentFrm[[${feed.feedId}]]`).submit();
                                             }
-                                        });
-                                    }
+                                        })
 
-                                    document.body.querySelector(`#editBtn[[${feed.feedId}]]`).addEventListener('click', () => {
-                                        document.body.querySelector(`#formEdit[[${feed.feedId}]]`).submit();
-                                        console.log('click')
-                                    });
+                                        document.querySelector(`#cancelComment[[${feed.feedId}]]`).addEventListener('click', (e) => {
+                                            document.getElementById(`placehold[[${feed.feedId}]]`).value = "";
+                                        })
 
-                                    document.body.querySelector(`#deleteBtn[[${feed.feedId}]]`).addEventListener('click', () => {
-                                        if (confirm("해당 피드글을 휴지통으로 보내시겠습니까??")) {
-                                            document.body.querySelector(`#formDelete[[${feed.feedId}]]`).submit();
-                                        }
-                                    });
-
-                                </script>
+                                    </script>
+                                </div>
                             </div>
-
                         </div>
                     </div>
+
+                    <script th:inline="javascript">
+                        if (document.body.querySelector(`.more[[${feed.feedId}]]`) != null) {
+                            document.body.querySelector(`.more[[${feed.feedId}]]`).addEventListener('click', () => {
+                                const content = document.body.querySelector(`.feedText[[${feed.feedId}]]`);
+                                let text = content.innerHTML;
+
+                                if (text.length > 100) {
+                                    content.innerHTML = [[${feed.shortContent}]];
+                                    document.body.querySelector(`.more[[${feed.feedId}]] > p`).innerHTML = 'more...';
+                                } else {
+                                    content.innerHTML = [[${feed.feedContent}]];
+                                    document.body.querySelector(`.more[[${feed.feedId}]] > p`).innerHTML = 'less...';
+                                }
+                            });
+                        }
+
+                        document.body.querySelector(`#editBtn[[${feed.feedId}]]`).addEventListener('click', () => {
+                            document.body.querySelector(`#formEdit[[${feed.feedId}]]`).submit();
+                            console.log('click')
+                        });
+
+                        document.body.querySelector(`#deleteBtn[[${feed.feedId}]]`).addEventListener('click', () => {
+                            if (confirm("해당 피드글을 휴지통으로 보내시겠습니까??")) {
+                                document.body.querySelector(`#formDelete[[${feed.feedId}]]`).submit();
+                            }
+                        });
+
+                    </script>
                 </div>
 
-                <!--pagingnation-->
-                <section class="d-flex justify-content-center mt-1">
-                    <div>
-                        <ul class="pagination pagination-sm">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#">&laquo;</a>
-                            </li>
-                            <li class="page-item active">
-                                <a class="page-link" href="#">1</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">2</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">3</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">4</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">5</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">&raquo;</a>
-                            </li>
-                        </ul>
-                    </div>
-                </section>
+
+                <!-- pagination -->
+                <th:block th:insert="~{community/pagination::pagination}"></th:block>
+                <!-- pagination -->
             </div>
         </main>
         <footer class="py-4 bg-light mt-auto">
@@ -487,8 +456,6 @@
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/myCompFeed.js"></script>
 <script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
-<script src="/assets/demo/chart-area-demo.js"></script>
-<script src="/assets/demo/chart-bar-demo.js"></script>
 <script crossorigin="anonymous"
         src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"></script>
 </body>

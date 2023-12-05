@@ -112,9 +112,9 @@
                             </a>
                             <div class="collapse" id="collapseMyFeed" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
                                 <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" th:href="@{/community/complete}">완료글</a>
-                                    <a class="nav-link" th:href="@{/community/temporal}">임시저장</a>
-                                    <a class="nav-link" th:href="@{/community/trash}">휴지통</a>
+                                    <a class="nav-link" th:href="@{/comp/list}">완료글</a>
+                                    <a class="nav-link" th:href="@{/temp/list}">임시저장</a>
+                                    <a class="nav-link" th:href="@{/trash/list}">휴지통</a>
                                 </nav>
                             </div>
                         </nav>
@@ -150,22 +150,22 @@
                                 <div class="form-group">
                                     <label class="col-form-label mt-0" for="feedTitle">Title</label>
                                     <input type="text" class="form-control"
-                                           placeholder="Title ( maximum : 20 words )" id="feedTitle" name="feedTitle">
+                                           placeholder="Title ( maximum : 20 words )" id="feedTitle" name="feedTitle" th:value="${feedTitle}">
+                                    <span class="text-danger" th:if="${error_feedTitle}" th:utext="${error_feedTitle}"></span>
                                 </div>
 
-
-                                <!--resize js 에서 구현-->
                                 <div class="form-group">
                                     <label for="feedContent" class="form-label mt-4">Content</label>
                                     <textarea class="form-control" id="feedContent" name="feedContent" rows="10"
-                                              placeholder="Enter the content. ( maximum : 500 words )"></textarea>
+                                              placeholder="Enter the content. ( maximum : 500 words )" th:text="${feedContent}"></textarea>
+                                    <span class="text-danger" th:if="${error_feedContent}" th:utext="${error_feedContent}"></span>
                                 </div>
 
 
                                 <div class="form-group">
                                     <label class="col-form-label mt-4" for="feedTag">Tag</label>
-                                    <input type="text" class="form-control" name="feedTag"
-                                           placeholder="Input tags. The delemeter of tags is comma ( , )" id="feedTag">
+                                    <input type="text" class="form-control" name="tagList"
+                                           placeholder="Input tags. The delemeter of tags is comma ( , )" id="feedTag" th:value="${tagList}">
                                 </div>
 
 

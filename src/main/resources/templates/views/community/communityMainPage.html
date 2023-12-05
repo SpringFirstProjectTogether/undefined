@@ -384,14 +384,14 @@
                                             <div class="col-2"><i class="fa-solid fa-xmark fa-xs cursor-pointer" th:id="${'changeComment' + feed.feedId}"></i></div>
                                         </div>
 
-                                        <textarea class="col-11" name="content" rows=1 th:id="${'placehold' + feed.feedId}" placeholder="답글을 작성하시오." onchange="resizeHeight()"></textarea>
-                                        <div class="row" style="font-size: 0.8em;">
-                                            <div class="text-muted mt-0 col-2 col-md-2 cursor-pointer"
+                                        <textarea class="col-12" name="content" rows=2 th:id="${'placehold' + feed.feedId}" placeholder="댓글을 작성하시오."></textarea>
+                                        <div>
+                                            <span class="text-primary cursor-pointer" style="font-size: 0.8em;"
                                                  th:id="${'addComment' + feed.feedId }">등록
-                                            </div>
-                                            <div class="text-danger mt-0 col-2 col-md-2 cursor-pointer"
+                                            </span>
+                                            <span class="text-danger ms-1 cursor-pointer" style="font-size: 0.8em;"
                                                  th:id="${'cancelComment' + feed.feedId }">지우기
-                                            </div>
+                                            </span>
                                         </div>
                                     </form>
                                     <script th:inline="javascript">
@@ -467,15 +467,8 @@
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/communityMainPage.js"></script>
 <script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
-<script src="/assets/demo/chart-area-demo.js"></script>
-<script src="/assets/demo/chart-bar-demo.js"></script>
 <script crossorigin="anonymous"
         src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"></script>
-<script>
-    const resizeHeight = () => {
-        document.getElementsByTagName("textarea").item(0).style.height = 'auto';
-    }
-</script>
 </body>
 
 </html>

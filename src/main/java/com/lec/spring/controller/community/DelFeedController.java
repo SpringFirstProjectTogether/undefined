@@ -20,11 +20,8 @@ public class DelFeedController {
     }
 
     @RequestMapping("/list")
-    public String list(Model model) {
-        List<FeedDTO> list = feedService.findAllDelFeedByUserId(1L);
-
-        model.addAttribute("list", list);
-        model.addAttribute("totalCnt", list == null ? 0 : list.size());
+    public String list(Integer page, Model model) {
+        feedService.listByUserId(1L, page, model, "del");
 
         return "community/myDelFeed";
     }
@@ -32,10 +29,10 @@ public class DelFeedController {
     // 휴지통 비우기
     @RequestMapping("/deleteAll")
     public String deleteAll(Model model) {
-        int result = feedService.deleteFeedAllByUserId(1L);
-        model.addAttribute(result);
+        int result = feedService.deleteFeedAllByUserId(1L, "del");
+        model.addAttribute("result", result);
 
-        return "community/deleteAllOk";
+        return "community/delDeleteOk";
     }
 
     // 복원
@@ -59,6 +56,6 @@ public class DelFeedController {
         int result = feedService.deleteFeed(feedId);
         model.addAttribute("result", result);
 
-        return "community/communityDeleteOk";
+        return "community/delDeleteOk";
     }
 }

@@ -19,7 +19,7 @@ window.addEventListener('DOMContentLoaded', event => {
     allDelete.addEventListener('click', () => {
         console.log("click~!~!~!")
         if(confirm("임시저장글을 모두 삭제하시겠습니까? ( 복원 불가능 )")) {
-            location.href='/trash/deleteAll';
+            location.href='/temp/deleteAll';
         }
     })
 
