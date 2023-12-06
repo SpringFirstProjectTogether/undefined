@@ -12,7 +12,7 @@
     <link href="/css/styles.css" rel="stylesheet"/>
     <script crossorigin="anonymous" src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/sketchy/bootstrap.min.css" rel="stylesheet">
-
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
     <style>
         .scrollbar::-webkit-scrollbar {
             width: 10px;
@@ -50,7 +50,8 @@
     <!-- Navbar-->
     <ul class="navbar-nav ms-auto me-0 me-md-3 my-2 my-md-0">
         <li class="nav-item dropdown">
-            <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="navbarDropdown"
+            <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"
+               id="navbarDropdown"
                role="button"><i class="fas fa-user fa-fw"></i></a>
             <ul aria-labelledby="navbarDropdown" class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" href="#!">Profile</a></li>
@@ -122,7 +123,8 @@
                     </div>
 
                     <!--Community-->
-                    <a aria-controls="collapseCommu" aria-expanded="false" class="nav-link collapsed" data-bs-target="#collapseCommu"
+                    <a aria-controls="collapseCommu" aria-expanded="false" class="nav-link collapsed"
+                       data-bs-target="#collapseCommu"
                        data-bs-toggle="collapse" href="#">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-users-between-lines"></i></div>
                         Community
@@ -272,11 +274,66 @@
                                 </p>
                                 <div class="row">
                                     <div class="col-7 col-sm-6 text-start">
-                                        <button class="btn btn-link col" type="button"><i
-                                                class="fa-regular fa-thumbs-up fa-sm"></i>&nbsp;+<span
-                                                th:text="${feed.likeCnt}">0</span></button>
+                                        <th:block th:if="${#arrays.contains(feed.likeUserList, 1L)}">
+                                            <button class="btn btn-link col true" th:id="${'likeBtn' + feed.feedId}"
+                                                    type="button">
+                                                <i class="fa-solid fa-thumbs-up fa-sm"
+                                                   th:id="${'likeIcon' + feed.feedId}"></i>
+                                                &nbsp;+<span th:id="${'likeCnt' + feed.feedId}"
+                                                             th:text="${feed.likeCnt}">0</span></button>
+                                        </th:block>
+                                        <th:block th:unless="${#arrays.contains(feed.likeUserList, 1L)}">
+                                            <button class="btn btn-link col false" th:id="${'likeBtn' + feed.feedId}"
+                                                    type="button">
+                                                <i class="fa-regular fa-thumbs-up fa-sm"
+                                                   th:id="${'likeIcon' + feed.feedId}"></i>
+                                                &nbsp;+<span th:id="${'likeCnt' + feed.feedId}"
+                                                             th:text="${feed.likeCnt}">0</span></button>
+                                        </th:block>
+                                        <script th:inline="javascript">
+                                            document.querySelector(`#likeBtn[[${feed.feedId}]]`).addEventListener('click', () => {
+                                                if (document.querySelector(`#likeBtn[[${feed.feedId}]]`).classList.contains('false')) {
+                                                    let data = {
+                                                        isLike: true,
+                                                        feedId: [[${feed.feedId}]],
+                                                    };
+                                                    $.ajax({
+                                                        type: "POST",
+                                                        url: "/rest/like",
+                                                        data: JSON.stringify(data),
+                                                        contentType: "application/json; charset=utf-8",
+                                                    }).done((response) => {
+                                                        console.log(response);
+                                                        document.querySelector(`#likeIcon[[${feed.feedId}]]`).classList.remove("fa-regular");
+                                                        document.querySelector(`#likeIcon[[${feed.feedId}]]`).classList.add("fa-solid");
+                                                        document.querySelector(`#likeBtn[[${feed.feedId}]]`).classList.remove("false");
+                                                        document.querySelector(`#likeBtn[[${feed.feedId}]]`).classList.add("true");
+                                                        document.querySelector(`#likeCnt[[${feed.feedId}]]`).innerHTML = response;
+                                                    });
+                                                } else {
+                                                    let data = {
+                                                        isLike: false,
+                                                        feedId: [[${feed.feedId}]],
+                                                    };
+                                                    $.ajax({
+                                                        type: "POST",
+                                                        url: "/rest/like",
+                                                        data: JSON.stringify(data),
+                                                        contentType: "application/json; charset=utf-8",
+                                                    }).done((response) => {
+                                                        console.log(response);
+                                                        document.querySelector(`#likeIcon[[${feed.feedId}]]`).classList.add("fa-regular");
+                                                        document.querySelector(`#likeIcon[[${feed.feedId}]]`).classList.remove("fa-solid");
+                                                        document.querySelector(`#likeBtn[[${feed.feedId}]]`).classList.add("false");
+                                                        document.querySelector(`#likeBtn[[${feed.feedId}]]`).classList.remove("true");
+                                                        document.querySelector(`#likeCnt[[${feed.feedId}]]`).innerHTML = response;
+                                                    });
+                                                }
+                                            })
+                                        </script>
                                         <button aria-expanded="true" class="btn btn-link col" data-bs-toggle="collapse"
-                                                th:aria-controls="${'#Collapse' + feed.feedId}" th:data-bs-target="${'#Collapse' + feed.feedId}"
+                                                th:aria-controls="${'#Collapse' + feed.feedId}"
+                                                th:data-bs-target="${'#Collapse' + feed.feedId}"
                                                 type="button">
                                             <i class="fa-regular fa-comment fa-sm"></i>&nbsp;comment
                                         </button>
@@ -284,17 +341,20 @@
                                     </div>
                                     <div class="col-5 col-sm-6 text-end">
                                         <form method="get"
-                                              style="display: none" th:action="@{'/community/update/' + ${feed.feedId}}" th:id="${'formEdit' + feed.feedId}">
+                                              style="display: none" th:action="@{'/community/update/' + ${feed.feedId}}"
+                                              th:id="${'formEdit' + feed.feedId}">
                                             <!-- 숨겨진 form 수정 시 해당 feed의 id를 넘겨주기 위함-->
                                         </form>
                                         <button class="btn btn-link col" th:id="${'editBtn' + feed.feedId}"
                                                 type="button">edit
                                         </button>
                                         <form method="post" name="frmDelete"
-                                              style="display: none" th:action="@{/community/delete}" th:id="${'formDelete' + feed.feedId}">
+                                              style="display: none" th:action="@{/community/delete}"
+                                              th:id="${'formDelete' + feed.feedId}">
                                             <input name="feedId" th:value="${feed.feedId}" type="hidden">
                                         </form>
-                                        <button class="btn btn-link col text-danger" th:id="${'deleteBtn' + feed.feedId}"
+                                        <button class="btn btn-link col text-danger"
+                                                th:id="${'deleteBtn' + feed.feedId}"
                                                 type="button">delete
                                         </button>
                                     </div>
@@ -306,11 +366,16 @@
                                          style="height: auto; max-height: 200px;" th:if="${feed.comments}">
                                         <div th:each="comment : ${feed.comments}">
                                             <div>
-                                                <span style="font-size: 0.9em" th:text="${comment.user.nickname}">Nickname</span><span class="text-danger cursor-pointer" th:id="${'commentDelBtn' + comment.commentId}">&nbsp;&nbsp;X</span>
+                                                <span style="font-size: 0.9em" th:text="${comment.user.nickname}">Nickname</span><span
+                                                    class="text-danger cursor-pointer"
+                                                    th:id="${'commentDelBtn' + comment.commentId}">&nbsp;&nbsp;X</span>
                                                 <br>
                                                 <span style="font-size: 0.8em" th:text="${comment.commentContent}">comment</span>
-                                                <form class="visually-hidden" method="post" th:action="@{/comment/delete}" th:id="${'commentDel' + comment.commentId}">
-                                                    <input name="commentId" th:value="${comment.commentId}" type="hidden"/>
+                                                <form class="visually-hidden" method="post"
+                                                      th:action="@{/comment/delete}"
+                                                      th:id="${'commentDel' + comment.commentId}">
+                                                    <input name="commentId" th:value="${comment.commentId}"
+                                                           type="hidden"/>
                                                 </form>
                                                 <script th:inline="javascript">
                                                     document.querySelector(`#commentDelBtn[[${comment.commentId}]]`).addEventListener('click', () => {
@@ -323,11 +388,16 @@
                                             <div class="ms-4"><!-- 대댓글 -->
                                                 <div th:each="reply: ${comment.replyDTOList}">
                                                     <div>
-                                                        <span style="font-size: 0.9em" th:text="${reply.user.nickname}">Nickname</span><span class="text-danger cursor-pointer" th:id="${'replyDelBtn' + reply.replyId}">&nbsp;&nbsp;X</span>
+                                                        <span style="font-size: 0.9em" th:text="${reply.user.nickname}">Nickname</span><span
+                                                            class="text-danger cursor-pointer"
+                                                            th:id="${'replyDelBtn' + reply.replyId}">&nbsp;&nbsp;X</span>
                                                         <br>
                                                         <span style="font-size: 0.8em" th:text="${reply.replyContent}">comment</span>
-                                                        <form class="visually-hidden" method="post" th:action="@{/reply/delete}" th:id="${'replyDel' + reply.replyId}">
-                                                            <input name="replyId" th:value="${reply.replyId}" type="hidden"/>
+                                                        <form class="visually-hidden" method="post"
+                                                              th:action="@{/reply/delete}"
+                                                              th:id="${'replyDel' + reply.replyId}">
+                                                            <input name="replyId" th:value="${reply.replyId}"
+                                                                   type="hidden"/>
                                                         </form>
 
                                                         <script th:inline="javascript">
@@ -339,14 +409,16 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="text-muted mt-0 cursor-pointer" style="font-size: 0.8em" th:id="${'reply' + comment.commentId}"
+                                            <div class="text-muted mt-0 cursor-pointer" style="font-size: 0.8em"
+                                                 th:id="${'reply' + comment.commentId}"
                                                  th:if="${comment}">답글달기
                                             </div>
                                             <form class="visually-hidden" method="post" th:action="@{/reply/write}"
                                                   th:id="${'replyFrm' + comment.commentId}">
                                                 <input name="parentId" th:value="${comment.commentId}" type="hidden"/>
                                                 <input name="feedId" th:value="${feed.feedId}" type="hidden"/>
-                                                <input name="content" th:id="${'replyContent' + comment.commentId}" type="hidden"/>
+                                                <input name="content" th:id="${'replyContent' + comment.commentId}"
+                                                       type="hidden"/>
                                                 <script th:inline="javascript">
                                                     document.querySelector(`#reply[[${comment.commentId}]]`).addEventListener('click', () => {
                                                         const re = document.getElementById(`isReply[[${feed.feedId}]]`);
@@ -361,7 +433,7 @@
                                                         })
 
                                                         document.querySelector(`#addComment[[${feed.feedId}]]`).addEventListener('click', (e) => {
-                                                            if(!document.getElementById(`isReply[[${feed.feedId}]]`).classList.contains('visually-hidden')){ // comment
+                                                            if (!document.getElementById(`isReply[[${feed.feedId}]]`).classList.contains('visually-hidden')) { // comment
                                                                 document.getElementById(`replyContent[[${comment.commentId}]]`).value = document.getElementById(`placehold[[${feed.feedId}]]`).value;
                                                                 document.getElementById(`replyFrm[[${comment.commentId}]]`).submit();
                                                             }
@@ -381,23 +453,26 @@
 
                                         <div class="row visually-hidden" th:id="${'isReply' + feed.feedId}">
                                             <div class="col-10" th:id="${'showRoute' + feed.feedId}"></div>
-                                            <div class="col-2"><i class="fa-solid fa-xmark fa-xs cursor-pointer" th:id="${'changeComment' + feed.feedId}"></i></div>
+                                            <div class="col-2"><i class="fa-solid fa-xmark fa-xs cursor-pointer"
+                                                                  th:id="${'changeComment' + feed.feedId}"></i></div>
                                         </div>
 
-                                        <textarea class="col-12" name="content" rows=2 th:id="${'placehold' + feed.feedId}" placeholder="댓글을 작성하시오."></textarea>
+                                        <textarea class="col-12" name="content" placeholder="댓글을 작성하시오."
+                                                  rows=2
+                                                  th:id="${'placehold' + feed.feedId}"></textarea>
                                         <div>
                                             <span class="text-primary cursor-pointer" style="font-size: 0.8em;"
-                                                 th:id="${'addComment' + feed.feedId }">등록
+                                                  th:id="${'addComment' + feed.feedId }">등록
                                             </span>
                                             <span class="text-danger ms-1 cursor-pointer" style="font-size: 0.8em;"
-                                                 th:id="${'cancelComment' + feed.feedId }">지우기
+                                                  th:id="${'cancelComment' + feed.feedId }">지우기
                                             </span>
                                         </div>
                                     </form>
                                     <script th:inline="javascript">
 
                                         document.querySelector(`#addComment[[${feed.feedId}]]`).addEventListener('click', (e) => {
-                                            if(document.getElementById(`isReply[[${feed.feedId}]]`).classList.contains('visually-hidden')){ // comment
+                                            if (document.getElementById(`isReply[[${feed.feedId}]]`).classList.contains('visually-hidden')) { // comment
                                                 document.getElementById(`commentFrm[[${feed.feedId}]]`).submit();
                                             }
                                         })

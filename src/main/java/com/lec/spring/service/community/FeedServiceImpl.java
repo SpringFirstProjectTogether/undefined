@@ -5,10 +5,7 @@ import com.lec.spring.domain.community.FeedDTO;
 import com.lec.spring.domain.community.ReplyDTO;
 import com.lec.spring.domain.community.CommentDTO;
 import com.lec.spring.domain.community.TagDTO;
-import com.lec.spring.repository.community.FeedRepository;
-import com.lec.spring.repository.community.ReplyRepository;
-import com.lec.spring.repository.community.CommentRepository;
-import com.lec.spring.repository.community.TagRepository;
+import com.lec.spring.repository.community.*;
 import jakarta.servlet.http.HttpSession;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,12 +32,14 @@ public class FeedServiceImpl implements FeedService {
     CommentRepository commentRepository;
     ReplyRepository replyRepository;
     TagRepository tagRepository;
+    LikeRepository likeRepository;
 
     public FeedServiceImpl(SqlSession sqlSession) {
         this.feedRepository = sqlSession.getMapper(FeedRepository.class);
         this.commentRepository = sqlSession.getMapper(CommentRepository.class);
         this.replyRepository = sqlSession.getMapper(ReplyRepository.class);
         this.tagRepository = sqlSession.getMapper(TagRepository.class);
+        this.likeRepository = sqlSession.getMapper(LikeRepository.class);
 
         System.out.println("FeedServiceImpl() 생성");
     }
@@ -84,6 +83,13 @@ public class FeedServiceImpl implements FeedService {
                 feed.setShortContent(feed.getFeedContent().substring(0, 100));
             }
 
+        }
+    }
+
+    // 피드의 likeUserList 초기화
+    public void setLikeUserList(List<FeedDTO> list) {
+        for(var feed : list) {
+            feed.setLikeUserList(likeRepository.findUsers(feed.getFeedId()));
         }
     }
 
@@ -138,6 +144,7 @@ public class FeedServiceImpl implements FeedService {
 
                 setShortContentPerFeed(list);
                 setTagListPerFeed(list);
+                setLikeUserList(list);
             }
             LocalDateTime end = LocalDateTime.now();
             model.addAttribute("list", list);
@@ -227,6 +234,7 @@ public class FeedServiceImpl implements FeedService {
 
                 setShortContentPerFeed(list);
                 setTagListPerFeed(list);
+                setLikeUserList(list);
             }
             LocalDateTime end = LocalDateTime.now();
             model.addAttribute("list", list);
@@ -293,6 +301,7 @@ public class FeedServiceImpl implements FeedService {
 
                 setShortContentPerFeed(list);
                 setTagListPerFeed(list);
+                setLikeUserList(list);
             }
             LocalDateTime end = LocalDateTime.now();
             model.addAttribute("list", list);
@@ -367,6 +376,7 @@ public class FeedServiceImpl implements FeedService {
 
                 setShortContentPerFeed(list);
                 setTagListPerFeed(list);
+                setLikeUserList(list);
             }
             LocalDateTime end = LocalDateTime.now();
             model.addAttribute("list", list);
@@ -444,6 +454,7 @@ public class FeedServiceImpl implements FeedService {
 
                 setShortContentPerFeed(list);
                 setTagListPerFeed(list);
+                setLikeUserList(list);
             }
             LocalDateTime end = LocalDateTime.now();
             model.addAttribute("list", list);

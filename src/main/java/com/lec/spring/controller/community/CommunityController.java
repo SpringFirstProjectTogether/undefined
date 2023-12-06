@@ -1,16 +1,21 @@
 package com.lec.spring.controller.community;
 
+import com.lec.spring.domain.UserDTO;
 import com.lec.spring.domain.community.FeedDTO;
 import com.lec.spring.domain.community.FeedValidator;
 import com.lec.spring.service.community.FeedService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,7 +23,6 @@ import java.util.List;
 @Controller
 @RequestMapping("/community")
 public class CommunityController {
-
     FeedService feedService;
 
     public CommunityController(FeedService feedService) {
@@ -43,6 +47,19 @@ public class CommunityController {
 
         return "community/communityMainPage";
     }
+
+    // like 기능
+    @RequestMapping("/like")
+    public String likeCount(
+            @RequestBody String requsetJSON,
+            HttpServletResponse response,
+            Model model
+    ) {
+        System.out.println("request json : " + requsetJSON);
+
+        return null;
+    }
+
 
     @GetMapping("/write")
     public String write() {
@@ -141,7 +158,6 @@ public class CommunityController {
     public void initBinder(WebDataBinder binder) {
         binder.setValidator(new FeedValidator());
     }
-
 
 
 }

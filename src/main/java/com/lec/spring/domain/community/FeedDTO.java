@@ -26,6 +26,7 @@ public class FeedDTO {
 
     private UserDTO user; // 글 작성자
     private List<CommentDTO> comments;  // 글의 댓글
+    private List<Long> likeUserList;
 
     // 첨부파일
     @ToString.Exclude
