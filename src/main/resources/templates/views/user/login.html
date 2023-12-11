@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>UNDEFINED LOGIN PAGE</title>
+    <!-- 가져온 template의 css-->
+    <link th:href="@{/css/styles.css}" rel="stylesheet" />
+    <!--sidebar 동작 시키는 js-->
+    <script th:src="@{/js/sidebar.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/sketchy/bootstrap.min.css">
+</head>
+
+<body>
+
+<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+    <!-- Navbar Brand-->
+    <a class="navbar-brand ps-3" href="index.html">Undefined</a>
+    <!-- Sidebar Toggle-->
+    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i
+            class="fas fa-bars"></i></button>
+    <!-- Navbar-->
+    <ul class="navbar-nav ms-auto me-0 me-md-3 my-2 my-md-0">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown"
+               aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+            <ul sec:authorize="isAuthenticated()" class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="#!">Profile</a></li>
+                <li>
+                    <hr class="dropdown-divider" />
+                </li>
+                <li><a class="dropdown-item" th:href="@{/user/logout}">LOG OUT</a></li>
+            </ul>
+            <ul sec:authorize="isAnonymous()" class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" th:href="@{/user/register}">Register</a></li>
+                <li>
+                    <hr class="dropdown-divider" />
+                </li>
+                <li><a class="dropdown-item" th:href="@{/user/login}">Login</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+
+<div id="layoutSidenav">
+    <div id="layoutSidenav_nav">
+        <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
+            <div class="sb-sidenav-menu">
+                <div class="nav">
+                    <!--Home-->
+                    <div class="sb-sidenav-menu-heading">Home</div>
+                    <a class="nav-link" href="index.html">
+                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        Dashboard
+                    </a>
+
+
+                    <!--Category-->
+                    <div class="sb-sidenav-menu-heading">Category</div>
+                    <!--Study-->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                       data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                        <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
+                        Study
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne"
+                         data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link" href="layout-static.html">Menu1</a>
+                            <a class="nav-link" href="layout-sidenav-light.html">Menu2</a>
+                        </nav>
+                    </div>
+
+                    <!--Project-->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                       data-bs-target="#collapseProject" aria-expanded="false" aria-controls="collapseProject">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-p"></i></div>
+                        &nbsp;Project
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseProject" aria-labelledby="headingOne"
+                         data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link" href="layout-static.html">Menu1</a>
+                            <a class="nav-link" href="layout-sidenav-light.html">Menu2 </a>
+                        </nav>
+                    </div>
+
+                    <!--QnA-->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                       data-bs-target="#collapseQnA" aria-expanded="false" aria-controls="collapseQnA">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-comments"></i></div>
+                        QnA
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseQnA" aria-labelledby="headingOne"
+                         data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link" href="layout-static.html">Menu1</a>
+                            <a class="nav-link" href="layout-sidenav-light.html">Menu2 </a>
+                        </nav>
+                    </div>
+
+                    <!--Job Info-->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                       data-bs-target="#collapseJobInfo" aria-expanded="false" aria-controls="collapseJobInfo">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-circle-info"></i></div>
+                        Job Info
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseJobInfo" aria-labelledby="headingOne"
+                         data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link" href="layout-static.html">Menu1</a>
+                            <a class="nav-link" href="layout-sidenav-light.html">Menu2 </a>
+                        </nav>
+                    </div>
+
+                    <!--Community-->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                       data-bs-target="#collapseCommunity" aria-expanded="false" aria-controls="collapseCommunity">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-users-between-lines"></i></div>
+                        Community
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseCommunity" aria-labelledby="headingOne"
+                         data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link" href="layout-static.html">Menu1</a>
+                            <a class="nav-link" href="layout-sidenav-light.html">Menu2 </a>
+                        </nav>
+                    </div>
+
+                    <div class="sb-sidenav-menu-heading">Account</div>
+                    <a class="nav-link" href="charts.html">
+                        <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                        Profile
+                    </a>
+                    <a class="nav-link" href="tables.html">
+                        <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                        Login
+                    </a>
+                </div>
+            </div>
+            <div class="sb-sidenav-footer">
+                <div class="small">Logged in as:</div>
+                <p sec:authorize="isAnonymous()">undefined</p><!-- <= 로그인시 해당 유정의 닉네임으로 변경, 로그아웃시에는 undefined-->
+                <p sec:authorize="isAuthenticated()" th:with="user=${#authentication.getPrincipal().getUser()}">[[${user.name}]]</p>
+            </div>
+        </nav>
+    </div>
+
+    <div id="layoutSidenav_content">
+        <div class="card border-primary mb-3 " style="max-width: 20rem;">
+            <div class="card-header d-flex justify-content-center">LOGIN</div>
+            <div class="card-body">
+                <form th:action="@{/user/login}" method="POST">
+
+                    <div class="row mt-5">
+                        <div class="col-12 text-danger" th:text="${errorMessage}">
+                            <!-- 에러 메세지 -->
+                        </div>
+                    </div>
+
+                    <div class="form-floating">
+                        <input type="text" class="form-control" name="username" id="username" th:value="${username}" placeholder="name@example.com" required>
+                        <label for="username">Username</label>
+                    </div>
+                    <div class="form-floating mt-1">
+                        <input type="password" class="form-control" name="password" id="password" value="" placeholder="Password" required>
+                        <label for="password">Password</label>
+                    </div>
+
+
+                    <button class="w-100 btn btn-lg btn-primary my-1 mt-3" type="submit">LOG IN</button>
+                    <a class="w-100 btn btn-lg btn-primary my-1" th:href="@{/user/register}">Register</a>
+
+                    <!-- OAuth 로그인 버튼 -->
+                    <a class="btn btn-lg my-1" th:href="@{https://kauth.kakao.com/oauth/authorize(response_type=${'code'}, client_id=${@environment.getProperty('app.oauth2.kakao.client-id')}, redirect_uri=${@environment.getProperty('app.oauth2.kakao.redirect-uri')})}">
+                        <img th:src="@{/image/kakao_login_button.png}" width="260" height="45">
+                    </a>
+                    <a class="btn btn-lg my-1" th:href="@{/oauth2/authorization/google}">
+                        <img th:src="@{/image/google_login_button.png}" width="260" height="45">
+                    </a>
+                    <a class="btn btn-lg my-1" th:href="@{/oauth2/authorization/naver}">
+                        <img th:src="@{/image/naver_login_button.png}" width="260" height="45">
+                    </a>
+                    <!-- OAuth 로그인 버튼 -->
+
+                </form>
+            </div>
+          </div>
+
+        <p class="codepen" data-height="265" data-theme-id="light" data-default-tab="js,result" data-user="Mamboleoo" data-slug-hash="XWJPxpZ" style="height: 265px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="Walkers - How to">
+  <span>See the Pen <a href="https://codepen.io/Mamboleoo/pen/XWJPxpZ">
+  Walkers - How to</a> by Louis Hoebregts (<a href="https://codepen.io/Mamboleoo">@Mamboleoo</a>)
+  on <a href="https://codepen.io">CodePen</a>.</span>
+        </p>
+        <script async src="https://static.codepen.io/assets/embed/ei.js"></script>
+
+        <footer class="py-4 bg-light mt-auto">
+            <div class="container-fluid px-4">
+                <div class="d-flex align-items-center justify-content-between small">
+                    <div class="text-muted">Copyright &copy; Undefined Website 2023</div>
+                    <div>
+                        <a href="#">Privacy Policy</a>
+                        &middot;
+                        <a href="#">Terms &amp; Conditions</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+</div>
+</body>
+
+</html>
