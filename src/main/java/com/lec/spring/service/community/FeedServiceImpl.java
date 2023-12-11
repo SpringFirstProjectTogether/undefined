@@ -408,6 +408,7 @@ public class FeedServiceImpl implements FeedService {
     public FeedDTO findFeedById(Long id) {
         List<FeedDTO> feed = List.of(feedRepository.findFeedById(id));
         setTagListPerFeed(feed);
+        setShortContentPerFeed(feed);
 
         return feed.get(0);
     }

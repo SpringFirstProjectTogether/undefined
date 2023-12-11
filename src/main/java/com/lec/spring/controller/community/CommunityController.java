@@ -1,14 +1,19 @@
 package com.lec.spring.controller.community;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lec.spring.domain.UserDTO;
 import com.lec.spring.domain.community.FeedDTO;
 import com.lec.spring.domain.community.FeedValidator;
 import com.lec.spring.service.community.FeedService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.Data;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -152,6 +157,23 @@ public class CommunityController {
         model.addAttribute("result", result);
 
         return "community/communityDeleteOk";
+    }
+
+    @PostMapping("/shortContent")
+    @ResponseBody
+    public String shortContent(
+            @RequestBody ShortContent request
+    )  {
+        if(request.getIsShort()) {
+            return feedService.findFeedById(request.getFeedId()).getShortContent();
+        }
+        return feedService.findFeedById(request.getFeedId()).getFeedContent();
+    }
+
+    @Data
+    static public class ShortContent {
+        private Boolean isShort;
+        private Long feedId;
     }
 
     @InitBinder
