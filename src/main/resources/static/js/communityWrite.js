@@ -1,119 +1,95 @@
-
-window.addEventListener('DOMContentLoaded', event => {
-
-    // Toggle the side navigation
-    const sidebarToggle = document.body.querySelector('#sidebarToggle');
+$(document).ready(function() {
+    // sidebar toggle
+    const sidebarToggle = $('#sidebarToggle');
     if (sidebarToggle) {
-        // Uncomment Below to persist sidebar toggle between refreshes
-        // if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
-        //     document.body.classList.toggle('sb-sidenav-toggled');
-        // }
-        sidebarToggle.addEventListener('click', event => {
-            event.preventDefault();
+        if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
             document.body.classList.toggle('sb-sidenav-toggled');
-            localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sb-sidenav-toggled'));
-        });
+        }
+        sidebarToggle.click(function (event) {
+            event.preventDefault();
+            $(`body`).toggleClass('sb-sidenav-toggled');
+            localStorage.setItem('sb|sidebar-toggle', $(`body`).hasClass('sb-sidenav-toggled'));
+        })
     }
 
+    $('.compBtn').click(function() {
+        $('#feedState').attr('value', 'comp');
+        $('.writeForm').submit();
+    })
 
+    $('.tempBtn').click(function() {
+        $('#feedState').attr('value', 'temp');
+        $('.writeForm').submit();
+    })
 
-    function DropFile(dropAreaId, fileListId) {
-        let dropArea = document.getElementById(dropAreaId);
-        let fileList = document.getElementById(fileListId);
+    $('.cancelBtn').click(function() {
+        history.back();
+    })
 
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
+    $('#formFile').change(function() {
+        showFileList(this);
+    })
+
+    $('#feedTitle').keyup(function() {
+        if($(this).val().length > 20) {
+            $(this).val($(this).val().substring(0, 20));
+        }
+        $('#titleWordCnt').text($(this).val().length);
+    })
+
+    $('#feedContent').keyup(function() {
+        if($(this).val().length > 500) {
+            $(this).val($(this).val().substring(0, 500));
         }
 
-        function highlight(e) {
-            preventDefaults(e);
-            dropArea.classList.add("highlight");
-        }
+        $('#contentWordCnt').text($(this).val().length);
+    })
 
-        function unhighlight(e) {
-            preventDefaults(e);
-            dropArea.classList.remove("highlight");
-        }
+})
 
-        function handleDrop(e) {
-            unhighlight(e);
-            let dt = e.dataTransfer;
-            let files = dt.files;
+const fileList = {};
 
-            handleFiles(files);
+function showFileList(obj) {
+    const dataTransfer = new DataTransfer();
+    const out = [];
 
-            const fileList = document.getElementById(fileListId);
-            if (fileList) {
-                fileList.scrollTo({ top: fileList.scrollHeight });
-            }
-        }
+    Array.from($(obj)[0].files)
+        .filter(file => fileList[file.name] === undefined)
+        .forEach(file => {
+            fileList[file.name] = file;
+            out.push( `
+                <div class="d-flex justify-content-between mb-0">
+                    <p>${file.name} (${Math.round(file.size / 1024)} KB)</p>
+                    <span class="text-danger cursor-pointer" data-file-name="${file.name}""><i class="fa-solid fa-x"></i></span>
+                </div>
+            `);
+    })
 
-        function handleFiles(files) {
-            files = [...files];
-            files.forEach(previewFile);
-        }
-
-        function previewFile(file) {
-            console.log(file);
-            fileList.appendChild(renderFile(file));
-        }
-
-        function renderFile(file) {
-            let fileDOM = document.createElement("div");
-            fileDOM.className = "file";
-            fileDOM.innerHTML = `
-            <div class="thumbnail">
-              <img src="https://img.icons8.com/pastel-glyph/2x/image-file.png" alt="파일타입 이미지" class="image">
-            </div>
-            <div class="details">
-              <header class="header">
-                <span class="name">${file.name}</span>
-                <span class="size">${file.size}</span>
-              </header>
-              <div class="progress">
-                <div class="bar"></div>
-              </div>
-              <div class="status">
-                <span class="percent">${file.path}</span>
-                <span class="speed">90KB/sec</span>
-              </div>
-            </div>
-          `;
-            return fileDOM;
-        }
-
-        dropArea.addEventListener("dragenter", highlight, false);
-        dropArea.addEventListener("dragover", highlight, false);
-        dropArea.addEventListener("dragleave", unhighlight, false);
-        dropArea.addEventListener("drop", handleDrop, false);
-
-        return {
-            handleFiles
-        };
+    for(const file in fileList) {
+        dataTransfer.items.add(fileList[file]);
     }
 
-    const dropFile = new DropFile("drop-file", "files");
+    $(obj)[0].files = dataTransfer.files;
 
-    const frm = document.body.querySelector('.writeForm');
+    $('#fileList').html($('#fileList').html() + out.join('\n'));
+    addDelete(obj);
+}
 
-    const compBtn = document.body.querySelector('.compBtn');
-    compBtn.addEventListener('click', () => {
-        document.querySelector('#feedState').setAttribute('value', 'comp');
-        frm.submit();
-    });
+function addDelete(obj) {
+    $('[data-file-name]').click(function() {
+        const fileName = $(this).attr('data-file-name');
+        delete fileList[fileName];
 
-    const tempBtn = document.body.querySelector('.tempBtn');
-    tempBtn.addEventListener('click', () => {
-        document.querySelector('#feedState').setAttribute('value', 'temp');
-        frm.submit();
-    });
+        const dataTransfer = new DataTransfer();
 
-    const cancelBtn = document.body.querySelector('.cancelBtn');
-    cancelBtn.addEventListener('click', () => {
-        // 취소할 시 완료글 페이지로 이동
-        // frm.submit();
-        location.href = `list`;
-    });
+        Array.from($(obj)[0].files)
+            .filter(file => file.name !== fileName)
+            .forEach(file => {
+                dataTransfer.items.add(file);
+        })
 
-});
+        $(obj)[0].files = dataTransfer.files;
+        $(this).parent().remove();
+
+    })
+}

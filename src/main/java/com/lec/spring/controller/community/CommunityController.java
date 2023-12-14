@@ -17,6 +17,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -24,6 +25,7 @@ import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/community")
@@ -73,9 +75,9 @@ public class CommunityController {
 
     @PostMapping("/write")
     public String writeOk(
-//            @RequestParam Map<String, MultipartFile> files   // 첨부 파일
-            @Valid FeedDTO feed
-            ,BindingResult result
+            @RequestParam List<MultipartFile> files   // 첨부 파일
+            , @Valid FeedDTO feed
+            , BindingResult result
             , Model model   // 매개변수 선언시 BindingResult 보다 Model 을 뒤에 두어야 한다.
             , RedirectAttributes redirectAttrs
     ){
@@ -92,7 +94,7 @@ public class CommunityController {
             return "redirect:/community/write";
         }
 
-        model.addAttribute("result", feedService.writeFeed(feed));
+        model.addAttribute("result", feedService.writeFeed(feed, files));
 
         if(feed.getFeedState().equals("comp"))
             return "community/writeCompOk";

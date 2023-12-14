@@ -12,6 +12,8 @@
     <link href="/css/styles.css" rel="stylesheet"/>
     <script crossorigin="anonymous" src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/sketchy/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script th:src="@{/js/myCompFeed.js}"></script>
 
     <style>
         .scrollbar::-webkit-scrollbar {
@@ -62,109 +64,9 @@
     </ul>
 </nav>
 <div id="layoutSidenav">
-    <div id="layoutSidenav_nav">
-        <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
-            <div class="sb-sidenav-menu">
-                <div class="nav">
-                    <!--Home-->
-                    <div class="sb-sidenav-menu-heading">Home</div>
-                    <a class="nav-link" href="index.html">
-                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                        Dashboard
-                    </a>
+    <!-- sidebar -->
+    <th:block th:insert="~{community/sidebar::sidebar}"></th:block>
 
-                    <!--Category-->
-                    <div class="sb-sidenav-menu-heading">Category</div>
-                    <!--Study-->
-                    <a aria-controls="collapseLayouts" aria-expanded="false" class="nav-link collapsed"
-                       data-bs-target="#collapseLayouts" data-bs-toggle="collapse" href="#">
-                        <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-                        Study/Project
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
-                    <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordion"
-                         id="collapseLayouts">
-                        <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="layout-static.html">Menu1</a>
-                            <a class="nav-link" href="layout-sidenav-light.html">Menu2</a>
-                        </nav>
-                    </div>
-
-                    <!--QnA-->
-                    <a aria-controls="collapseQnA" aria-expanded="false" class="nav-link collapsed"
-                       data-bs-target="#collapseQnA" data-bs-toggle="collapse" href="#">
-                        <div class="sb-nav-link-icon"><i class="fa-solid fa-comments"></i></div>
-                        QnA
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
-                    <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordion"
-                         id="collapseQnA">
-                        <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="layout-static.html">Menu1</a>
-                            <a class="nav-link" href="layout-sidenav-light.html">Menu2 </a>
-                        </nav>
-                    </div>
-
-                    <!--Job Info-->
-                    <a aria-controls="collapseJobInfo" aria-expanded="false" class="nav-link collapsed"
-                       data-bs-target="#collapseJobInfo" data-bs-toggle="collapse" href="#">
-                        <div class="sb-nav-link-icon"><i class="fa-solid fa-circle-info"></i></div>
-                        Job Info
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
-                    <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordion"
-                         id="collapseJobInfo">
-                        <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="layout-static.html">Menu1</a>
-                            <a class="nav-link" href="layout-sidenav-light.html">Menu2 </a>
-                        </nav>
-                    </div>
-
-                    <!--Community-->
-                    <a aria-controls="collapseCommu" aria-expanded="false" class="nav-link collapsed"
-                       data-bs-target="#collapseCommu" data-bs-toggle="collapse" href="#">
-                        <div class="sb-nav-link-icon"><i class="fa-solid fa-users-between-lines"></i></div>
-                        Community
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
-                    <div aria-labelledby="headingTwo" class="collapse" data-bs-parent="#sidenavAccordion"
-                         id="collapseCommu">
-                        <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
-                            <a class="nav-link" th:href="@{/community/list}">Main</a>
-                            <a class="nav-link" th:href="@{/community/write}">Write</a>
-                            <a aria-controls="collapseMyFeed" aria-expanded="false" class="nav-link collapsed"
-                               data-bs-target="#collapseMyFeed" data-bs-toggle="collapse" href="#">
-                                My Feed
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>
-                            <div aria-labelledby="headingOne" class="collapse"
-                                 data-bs-parent="#sidenavAccordionPages" id="collapseMyFeed">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" th:href="@{/comp/list}">완료글</a>
-                                    <a class="nav-link" th:href="@{/temp/list}">임시저장</a>
-                                    <a class="nav-link" th:href="@{/trash/list}">휴지통</a>
-                                </nav>
-                            </div>
-                        </nav>
-                    </div>
-
-                    <div class="sb-sidenav-menu-heading">Account</div>
-                    <a class="nav-link" href="charts.html">
-                        <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                        Profile
-                    </a>
-                    <a class="nav-link" href="tables.html">
-                        <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                        Login
-                    </a>
-                </div>
-            </div>
-            <div class="sb-sidenav-footer">
-                <div class="small">Logged in as:</div>
-                undefined<!-- <= 로그인시 해당 유정의 닉네임으로 변경, 로그아웃시에는 undefined-->
-            </div>
-        </nav>
-    </div>
     <div id="layoutSidenav_content">
         <main>
 
@@ -245,13 +147,24 @@
                                 </p>
                                 <div class="row">
                                     <div class="col-7 col-sm-6 text-start">
-                                        <button class="btn btn-link col" type="button"><i
-                                                class="fa-regular fa-thumbs-up fa-sm"></i>&nbsp;+<span
-                                                th:text="${feed.likeCnt}">0</span></button>
+                                        <button th:class="${#arrays.contains(feed.likeUserList, 1L) ? 'btn btn-link col like' : 'btn btn-link col'}"
+                                                th:id="${'likeBtn' + feed.feedId}"
+                                                type="button">
+                                            <span th:class="${#arrays.contains(feed.likeUserList, 1L) ? 'likeIcon' : 'likeIcon visually-hidden'}">
+                                                <i class="fa-solid fa-thumbs-up fa-sm"></i>
+                                            </span>
+                                            <span th:class="${#arrays.contains(feed.likeUserList, 1L) ? 'likeIcon visually-hidden' : 'likeIcon'}">
+                                                <i class="fa-regular fa-thumbs-up fa-sm"></i>
+                                            </span>
+                                            &nbsp;+<span th:id="${'likeCnt' + feed.feedId}"
+                                                         th:text="${feed.likeCnt}">0</span>
+                                        </button>
                                         <button aria-expanded="true" class="btn btn-link col"
                                                 data-bs-toggle="collapse"
                                                 th:aria-controls="${'#Collapse' + feed.feedId}"
-                                                th:data-bs-target="${'#Collapse' + feed.feedId}" type="button">
+                                                th:data-bs-target="${'#Collapse' + feed.feedId}"
+                                                type="button"
+                                                th:id="${'cmtBtn' + feed.feedId}">
                                             <i class="fa-regular fa-comment fa-sm"></i>&nbsp;comment
                                         </button>
                                         <!-- <button type="button" class="btn btn-link col"><i class="fa-regular fa-comment fa-sm"></i>&nbsp;comment</button> -->
@@ -278,158 +191,22 @@
                                 <div class="accordion-collapse collapse hidden" th:id="${'Collapse' + feed.feedId}">
                                     <hr>
                                     <div class="accordion-body overflow-auto scrollbar"
-                                         style="height: auto; max-height: 200px;" th:if="${feed.comments}">
-                                        <div th:each="comment : ${feed.comments}">
-                                            <div>
-                                                <span style="font-size: 0.9em" th:text="${comment.user.nickname}">Nickname</span><span
-                                                    class="text-danger cursor-pointer"
-                                                    th:id="${'commentDelBtn' + comment.commentId}">&nbsp;&nbsp;X</span>
-                                                <br>
-                                                <span style="font-size: 0.8em" th:text="${comment.commentContent}">comment</span>
-                                                <form class="visually-hidden" method="post"
-                                                      th:action="@{/comment/delete}"
-                                                      th:id="${'commentDel' + comment.commentId}">
-                                                    <input name="commentId" th:value="${comment.commentId}"
-                                                           type="hidden"/>
-                                                </form>
-                                                <script th:inline="javascript">
-                                                    document.querySelector(`#commentDelBtn[[${comment.commentId}]]`).addEventListener('click', () => {
-                                                        document.querySelector(`#commentDel[[${comment.commentId}]]`).submit();
-                                                    })
-
-                                                </script>
-
-                                            </div>
-                                            <div class="ms-4"><!-- 대댓글 -->
-                                                <div th:each="reply: ${comment.replyDTOList}">
-                                                    <div>
-                                                        <span style="font-size: 0.9em" th:text="${reply.user.nickname}">Nickname</span><span
-                                                            class="text-danger cursor-pointer"
-                                                            th:id="${'replyDelBtn' + reply.replyId}">&nbsp;&nbsp;X</span>
-                                                        <br>
-                                                        <span style="font-size: 0.8em" th:text="${reply.replyContent}">comment</span>
-                                                        <form class="visually-hidden" method="post"
-                                                              th:action="@{/reply/delete}"
-                                                              th:id="${'replyDel' + reply.replyId}">
-                                                            <input name="replyId" th:value="${reply.replyId}"
-                                                                   type="hidden"/>
-                                                        </form>
-
-                                                        <script th:inline="javascript">
-                                                            document.querySelector(`#replyDelBtn[[${reply.replyId}]]`).addEventListener('click', () => {
-                                                                document.querySelector(`#replyDel[[${reply.replyId}]]`).submit();
-                                                            })
-                                                        </script>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="text-muted mt-0 cursor-pointer" style="font-size: 0.8em"
-                                                 th:id="${'reply' + comment.commentId}"
-                                                 th:if="${comment}">답글달기
-                                            </div>
-                                            <form class="visually-hidden" method="post" th:action="@{/reply/write}"
-                                                  th:id="${'replyFrm' + comment.commentId}">
-                                                <input name="parentId" th:value="${comment.commentId}" type="hidden"/>
-                                                <input name="feedId" th:value="${feed.feedId}" type="hidden"/>
-                                                <input name="content" th:id="${'replyContent' + comment.commentId}"
-                                                       type="hidden"/>
-                                                <script th:inline="javascript">
-                                                    document.querySelector(`#reply[[${comment.commentId}]]`).addEventListener('click', () => {
-                                                        const re = document.getElementById(`isReply[[${feed.feedId}]]`);
-                                                        re.classList.remove('visually-hidden');
-                                                        const comment = [[${comment.commentContent}]];
-                                                        document.getElementById(`showRoute[[${feed.feedId}]]`).innerHTML = `[[${comment.user.nickname}]] : ${comment.substr(0, 10)}...에 대한 답글 작성 중...`;
-                                                        document.getElementById(`placehold[[${feed.feedId}]]`).placeholder = `답글을 작성하시오.`;
-
-                                                        document.getElementById(`changeComment[[${feed.feedId}]]`).addEventListener('click', () => {
-                                                            re.classList.add('visually-hidden');
-                                                            document.getElementById(`placehold[[${feed.feedId}]]`).placeholder = `댓글 작성하시오.`;
-                                                        })
-
-                                                        document.querySelector(`#addComment[[${feed.feedId}]]`).addEventListener('click', (e) => {
-                                                            if (!document.getElementById(`isReply[[${feed.feedId}]]`).classList.contains('visually-hidden')) { // comment
-                                                                document.getElementById(`replyContent[[${comment.commentId}]]`).value = document.getElementById(`placehold[[${feed.feedId}]]`).value;
-                                                                document.getElementById(`replyFrm[[${comment.commentId}]]`).submit();
-                                                            }
-                                                        })
-
-                                                    })
-                                                </script>
-                                            </form>
-                                            <br>
-                                        </div>
+                                         style="height: auto; max-height: 200px;">
+                                        <th:block th:insert="~{community/comment::comment}"></th:block>
                                     </div>
                                     <br>
-                                    <form method="post" th:action="@{/comment/write}"
-                                          th:id="${'commentFrm' + feed.feedId}">
-                                        <input name="feedId" th:value="${feed.feedId}" type="hidden"/>
-
-                                        <div class="row visually-hidden" th:id="${'isReply' + feed.feedId}">
-                                            <div class="col-10" th:id="${'showRoute' + feed.feedId}"></div>
-                                            <div class="col-2"><i class="fa-solid fa-xmark fa-xs cursor-pointer"
-                                                                  th:id="${'changeComment' + feed.feedId}"></i>
-                                            </div>
-                                        </div>
-
-                                        <textarea class="col-12" name="content" placeholder="댓글을 작성하시오."
-                                                  rows=2
-                                                  th:id="${'placehold' + feed.feedId}"></textarea>
-                                        <div>
-                                            <span class="text-primary cursor-pointer" style="font-size: 0.8em;"
-                                                  th:id="${'addComment' + feed.feedId }">등록
-                                            </span>
-                                            <span class="text-danger ms-1 cursor-pointer" style="font-size: 0.8em;"
-                                                  th:id="${'cancelComment' + feed.feedId }">지우기
-                                            </span>
-                                        </div>
-                                    </form>
-                                    <script th:inline="javascript">
-
-                                        document.querySelector(`#addComment[[${feed.feedId}]]`).addEventListener('click', (e) => {
-                                            if (document.getElementById(`isReply[[${feed.feedId}]]`).classList.contains('visually-hidden')) { // comment
-                                                document.getElementById(`commentFrm[[${feed.feedId}]]`).submit();
-                                            }
-                                        })
-
-                                        document.querySelector(`#cancelComment[[${feed.feedId}]]`).addEventListener('click', (e) => {
-                                            document.getElementById(`placehold[[${feed.feedId}]]`).value = "";
-                                        })
-
-                                    </script>
+                                    <div class="d-flex visually-hidden" th:id="${'isReply' + feed.feedId}">
+                                        <div class="col-11"></div>
+                                        <div class="col-1 text-secondary cursor-pointer text-center" th:id="${'cancelReply' + feed.feedId}"><i class="fa-solid fa-xmark"></i></div>
+                                    </div>
+                                    <div class="input-group mt-1">
+                                        <input type="text" class="form-control" placeholder="댓글을 입력하시오." th:id="${'input_comment' + feed.feedId}">
+                                        <button type="button" class="btn btn-primary" th:id="${'btn_comment' + feed.feedId}">작성</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <script th:inline="javascript">
-                        if (document.body.querySelector(`.more[[${feed.feedId}]]`) != null) {
-                            document.body.querySelector(`.more[[${feed.feedId}]]`).addEventListener('click', () => {
-                                const content = document.body.querySelector(`.feedText[[${feed.feedId}]]`);
-                                let text = content.innerHTML;
-
-                                if (text.length > 100) {
-                                    content.innerHTML = [[${feed.shortContent}]];
-                                    document.body.querySelector(`.more[[${feed.feedId}]] > p`).innerHTML = 'more...';
-                                } else {
-                                    content.innerHTML = [[${feed.feedContent}]];
-                                    document.body.querySelector(`.more[[${feed.feedId}]] > p`).innerHTML = 'less...';
-                                }
-                            });
-                        }
-
-                        document.body.querySelector(`#editBtn[[${feed.feedId}]]`).addEventListener('click', () => {
-                            document.body.querySelector(`#formEdit[[${feed.feedId}]]`).submit();
-                            console.log('click')
-                        });
-
-                        document.body.querySelector(`#deleteBtn[[${feed.feedId}]]`).addEventListener('click', () => {
-                            if (confirm("해당 피드글을 휴지통으로 보내시겠습니까??")) {
-                                document.body.querySelector(`#formDelete[[${feed.feedId}]]`).submit();
-                            }
-                        });
-
-                    </script>
                 </div>
 
 
@@ -454,10 +231,5 @@
 </div>
 <script crossorigin="anonymous"
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/js/myCompFeed.js"></script>
-<script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
-<script crossorigin="anonymous"
-        src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"></script>
 </body>
-
 </html>

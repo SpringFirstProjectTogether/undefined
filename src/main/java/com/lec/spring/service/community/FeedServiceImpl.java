@@ -2,21 +2,33 @@ package com.lec.spring.service.community;
 
 import com.lec.spring.domain.UserDTO;
 import com.lec.spring.domain.community.FeedDTO;
-import com.lec.spring.domain.community.ReplyDTO;
 import com.lec.spring.domain.community.CommentDTO;
+import com.lec.spring.domain.community.PhotoDTO;
 import com.lec.spring.domain.community.TagDTO;
 import com.lec.spring.repository.community.*;
 import jakarta.servlet.http.HttpSession;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import com.lec.spring.util.U;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -28,39 +40,24 @@ public class FeedServiceImpl implements FeedService {
     @Value("${app.pagination.write_pages}")
     private int WRITE_PAGES;
 
+    @Value("${app.upload.path}")
+    private String uploadDir;
+
     FeedRepository feedRepository;
     CommentRepository commentRepository;
-    ReplyRepository replyRepository;
     TagRepository tagRepository;
     LikeRepository likeRepository;
+    PhotoRepository photoRepository;
 
     public FeedServiceImpl(SqlSession sqlSession) {
         this.feedRepository = sqlSession.getMapper(FeedRepository.class);
         this.commentRepository = sqlSession.getMapper(CommentRepository.class);
-        this.replyRepository = sqlSession.getMapper(ReplyRepository.class);
         this.tagRepository = sqlSession.getMapper(TagRepository.class);
         this.likeRepository = sqlSession.getMapper(LikeRepository.class);
+        this.photoRepository = sqlSession.getMapper(PhotoRepository.class);
 
         System.out.println("FeedServiceImpl() 생성");
     }
-
-    // feed의 모든 댓글 가져오기
-    public List<CommentDTO> findCommentsByFeedId(Long feedId) {
-        var list = commentRepository.findCommentsByFeedId(feedId);
-
-        // 해당 댓글의 모든 대댓글 가져오기
-        list.forEach(outer -> {
-            outer.setReplyDTOList(findRepliesByParentId(outer.getCommentId()));
-        });
-
-        return list;
-    }
-
-    // 댓글의 모든 대댓글 가져오기
-    public List<ReplyDTO> findRepliesByParentId(Long parentId) {
-        return replyRepository.findReplyByParentID(parentId);
-    }
-
 
     // 해당 피드의 태그 목록을 저장
     public void setTagListPerFeed(List<FeedDTO> list) {
@@ -93,39 +90,57 @@ public class FeedServiceImpl implements FeedService {
         }
     }
 
+    public void setFileList(List<FeedDTO> list) {
+        for(var feed : list) {
+            List<PhotoDTO> fileList = photoRepository.findByFeed(feed.getFeedId());
+            setImage(fileList);
+            feed.setFileList(fileList);
+        }
+    }
+
+    private void setImage(List<PhotoDTO> fileList) {
+        String realPath = new File(uploadDir).getAbsolutePath();
+
+        for(var file : fileList) {
+            BufferedImage imgData = null;
+            File f = new File(realPath, file.getFilename());
+
+            try {
+                imgData = ImageIO.read(f);
+            } catch (IOException e) {
+                System.out.println("file is not exist");
+                throw new RuntimeException(e);
+            }
+
+            if(imgData != null) file.setImage(true);
+        }
+    }
+
     @Override
     public List<FeedDTO> list(Integer page, Model model) {
-        // 현재 페이지 parameter
+
         if(page == null) page = 1;  // 디폴트는 1page
         if(page < 1) page = 1;
 
         // 페이징
-        // writePages: 한 [페이징] 당 몇개의 페이지가 표시되나
-        // pageRows: 한 '페이지'에 몇개의 글을 리스트 할것인가?
         HttpSession session = U.getSession();
         Integer writePages = (Integer)session.getAttribute("writePages");
         if(writePages == null) writePages = WRITE_PAGES;  // 만약 session 에 없으면 기본값으로 동작
         Integer pageRows = (Integer)session.getAttribute("pageRows");
         if(pageRows == null) pageRows = PAGE_ROWS;  // 만약 session 에 없으면 기본값으로 동작
 
-        // 현재 페이지 번호 -> session 에 저장
         session.setAttribute("page", page);
 
-        long cnt = feedRepository.countAll();   // 글 목록 전체의 개수
-        int totalPage = (int)Math.ceil(cnt / (double)pageRows);   // 총 몇 '페이지' ?
+        long cnt = feedRepository.countAll();
+        int totalPage = (int)Math.ceil(cnt / (double)pageRows);
 
-        // [페이징] 에 표시할 '시작페이지' 와 '마지막페이지'
         int startPage = 0;
         int endPage = 0;
 
-        // 해당 페이지의 글 목록
         List<FeedDTO> list = null;
 
-        if(cnt > 0){  // 데이터가 최소 1개 이상 있는 경우만 페이징
-            //  page 값 보정
+        if(cnt > 0){
             if(page > totalPage) page = totalPage;
-
-            // 몇번째 데이터부터 fromRow
             int fromRow = (page - 1) * pageRows;
 
             // [페이징] 에 표시할 '시작페이지' 와 '마지막페이지' 계산
@@ -137,14 +152,10 @@ public class FeedServiceImpl implements FeedService {
             LocalDateTime start = LocalDateTime.now();
             list = feedRepository.findAllCompFeedFromRow(fromRow, pageRows);
             if(list != null) {
-                // 해당 피드의 모든 댓글 가져오기
-                list.forEach(feed -> {
-                    feed.setComments(findCommentsByFeedId(feed.getFeedId()));
-                });
-
                 setShortContentPerFeed(list);
                 setTagListPerFeed(list);
                 setLikeUserList(list);
+                setFileList(list);
             }
             LocalDateTime end = LocalDateTime.now();
             model.addAttribute("list", list);
@@ -228,10 +239,6 @@ public class FeedServiceImpl implements FeedService {
             LocalDateTime start = LocalDateTime.now();
             list = feedRepository.listByNicknameFromRow(nickname, fromRow, pageRows);
             if(list != null) {
-                list.forEach(feed -> {
-                    feed.setComments(findCommentsByFeedId(feed.getFeedId()));
-                });
-
                 setShortContentPerFeed(list);
                 setTagListPerFeed(list);
                 setLikeUserList(list);
@@ -295,10 +302,6 @@ public class FeedServiceImpl implements FeedService {
             LocalDateTime start = LocalDateTime.now();
             list = feedRepository.listByTagFromRow(feedIdList, fromRow, pageRows);
             if(list != null) {
-                list.forEach(feed -> {
-                    feed.setComments(findCommentsByFeedId(feed.getFeedId()));
-                });
-
                 setShortContentPerFeed(list);
                 setTagListPerFeed(list);
                 setLikeUserList(list);
@@ -370,10 +373,6 @@ public class FeedServiceImpl implements FeedService {
             LocalDateTime start = LocalDateTime.now();
             list = feedRepository.listByAllFromRow(feedIdList, fromRow, pageRows);
             if(list != null) {
-                list.forEach(feed -> {
-                    feed.setComments(findCommentsByFeedId(feed.getFeedId()));
-                });
-
                 setShortContentPerFeed(list);
                 setTagListPerFeed(list);
                 setLikeUserList(list);
@@ -449,11 +448,7 @@ public class FeedServiceImpl implements FeedService {
             LocalDateTime start = LocalDateTime.now();
             list = feedRepository.myFeedFromRow(userId, fromRow, pageRows, state);
             if(list != null) {
-                list.forEach(feed -> {
-                    feed.setComments(findCommentsByFeedId(feed.getFeedId()));
-                });
-
-                setShortContentPerFeed(list);
+               setShortContentPerFeed(list);
                 setTagListPerFeed(list);
                 setLikeUserList(list);
             }
@@ -489,7 +484,7 @@ public class FeedServiceImpl implements FeedService {
     // User : 이건 흠...일단 나중에 security 구현하면서 해보자 : 임의로 feed의 user 세팅 필요
     // 첨부 파일에 관해 다루는 메소드도 필요
     @Override
-    public int writeFeed(FeedDTO feed) {
+    public int writeFeed(FeedDTO feed, List<MultipartFile> files) {
 
         // add 하기 위해서 필요한 작업
         // user 초기화
@@ -515,16 +510,85 @@ public class FeedServiceImpl implements FeedService {
         // feed를 추가
         int result = feedRepository.saveFeed(feed);
 
-        // Tag 추가 코드는 분리해도 될듯??
+        // Tag 추가 코드
         if(result == 1) {
             result = addTagForFeed(feed);
         }
 
         // 첨부 파일 추가
-        // TODO
-
+        addFiles(files, feed.getFeedId());
 
         return result;
+    }
+
+    private void addFiles(List<MultipartFile> files, Long feedId) {
+        if(files != null) {
+            for(var e : files){
+                // 물리적인 파일 저장
+                PhotoDTO photo = upload(e);
+
+                // 성공하면 DB 에도 저장
+                if(photo != null){
+                    photo.setFeedId(feedId);   // FK 설정
+                    System.out.println("photo : " + photo);
+                    photoRepository.save(photo);   // INSERT
+                }
+            }
+        }
+    }
+
+    private PhotoDTO upload(MultipartFile multipartFile) {
+        PhotoDTO photo = null;
+
+        // 담긴 파일이 없으면 pass
+        String originalFilename = multipartFile.getOriginalFilename();
+        if(originalFilename == null || originalFilename.length() == 0) return null;
+
+        // 원본파일명
+        String sourceName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+        // 저장될 파일명
+        String fileName = sourceName;
+
+        // 파일명 이 중복되는지 확인
+        File file = new File(uploadDir, sourceName);
+        if(file.exists()){  // 이미 존재하는 파일명,  중복되면 다름 이름으로 변경하여 저장
+            // a.txt => a_2378142783946.txt  : time stamp 값을 활용할거다!
+            int pos = fileName.lastIndexOf(".");
+            if(pos > -1){   // 확장자가 있는 경우
+                String name = fileName.substring(0, pos);  // 파일 '이름'
+                String ext = fileName.substring(pos + 1);   // 파일 '확장자'
+
+                // 중복방지를 위한 새로운 이름 (현재시간 ms) 를 파일명에 추가
+                fileName = name + "_" + System.currentTimeMillis() + "." + ext;
+            } else {  // 확장자가 없는 경우
+                fileName += "_" + System.currentTimeMillis();
+            }
+        }
+
+        // java.nio
+        Path copyOfLocation = Paths.get(new File(uploadDir, fileName).getAbsolutePath());
+        System.out.println(copyOfLocation);
+
+        try {
+            // inputStream을 가져와서
+            // copyOfLocation (저장위치)로 파일을 쓴다.
+            // copy의 옵션은 기존에 존재하면 REPLACE(대체한다), 오버라이딩 한다
+
+            Files.copy(
+                    multipartFile.getInputStream(),
+                    copyOfLocation,
+                    StandardCopyOption.REPLACE_EXISTING    // 기존에 존재하면 덮어쓰기
+            );
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        photo = PhotoDTO.builder()
+                .filename(fileName)   // 저장된 이름
+                .sourcename(sourceName)  // 원본 이름
+                .build();
+
+        return photo;
     }
 
     private int addTagForFeed(FeedDTO feed) {
@@ -542,6 +606,7 @@ public class FeedServiceImpl implements FeedService {
                     // 새로운 tag 일 시, 저장하고 pk 값 받아오기
                     TagDTO newTagDTO = new TagDTO();
                     newTagDTO.setTagName(tag.trim());
+                    System.out.println("here??");
                     int success = tagRepository.addTag(newTagDTO);
 
                     if(success == 1) tagId = newTagDTO.getTagId();

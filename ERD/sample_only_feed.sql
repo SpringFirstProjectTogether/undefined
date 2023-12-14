@@ -95,3 +95,6 @@ VALUES (1, 1),
 
 SELECT * FROM feed_comments;
 SELECT * FROM feed_comments WHERE feed_id = 3 AND parent_id IS null;
+
+
+SELECT * FROM feed_photos;

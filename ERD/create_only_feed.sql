@@ -51,7 +51,8 @@ CREATE TABLE feed_photos
 (
     photo_id int NOT NULL AUTO_INCREMENT,
     feed_id int NOT NULL,
-    photo_url varchar(1000) NOT NULL,
+    source_name varchar(1000) NOT NULL,
+    file_name varchar(1000) NOT NULL,
     PRIMARY KEY (photo_id)
 );
 

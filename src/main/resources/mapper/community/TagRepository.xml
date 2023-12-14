@@ -26,7 +26,7 @@
     </select>
 
     <insert id="addTag" flushCache="true" parameterType="com.lec.spring.domain.community.TagDTO" useGeneratedKeys="true" keyColumn="tag_id" keyProperty="tagId">
-        INSERT INTO feed_tags (tag_name) VALUES ( #{tag} )
+        INSERT INTO feed_tags (tag_name) VALUES ( #{tagName} )
     </insert>
 
     <insert id="addTagAndFeed" flushCache="true">

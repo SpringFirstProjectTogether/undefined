@@ -2,9 +2,13 @@ package com.lec.spring.service.community;
 
 import com.lec.spring.domain.UserDTO;
 import com.lec.spring.domain.community.CommentDTO;
+import com.lec.spring.domain.community.QryCommentList;
+import com.lec.spring.domain.community.QryResult;
 import com.lec.spring.repository.community.CommentRepository;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -16,26 +20,60 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public int addCommentByFeedId(Long feedId, String content) {
-        // 임의로 하나 생성
-        UserDTO user = UserDTO.builder()
-                .userId(1L)
-                .loginId("id1")
-                .password("password_1")
-                .nickname("User1")
-                .build();
+    public QryResult addCommentByFeedId(
+            Long feedId,
+            Long parentId,
+            Long userId,
+            String content
+    ) {
 
         CommentDTO commentDTO = CommentDTO.builder()
                 .commentFeedId(feedId)
                 .commentContent(content)
-                .user(user)
+                .parentId(parentId)
+                .user(UserDTO.builder().userId(userId).build())
                 .build();
 
-        return commentRepository.addComment(commentDTO);
+        int cnt = commentRepository.addComment(commentDTO);
+        String status = "FAIL";
+
+        if(cnt > 0) status = "OK";
+
+        return QryResult.builder()
+                .count(cnt)
+                .status(status)
+                .build();
     }
 
     @Override
-    public int deleteCommentById(Long commentId) {
-        return commentRepository.deleteComment(commentId);
+    public QryResult deleteCommentById(Long commentId) {
+        int cnt = commentRepository.deleteComment(commentId);
+        String status = "FAIL";
+
+        if(cnt > 0) status = "OK";
+
+        return QryResult.builder()
+                .count(cnt)
+                .status(status)
+                .build();
     }
+
+    @Override
+    public QryCommentList list(Long feedId) {
+        QryCommentList list = new QryCommentList();
+
+        List<CommentDTO> comments = commentRepository.findCommentsByFeedId(feedId);
+        int cnt = comments.size();
+        for(var comment : comments) {
+            comment.setReplyList(commentRepository.findRepliesByFeedId(comment.getCommentId()));
+            cnt += comment.getReplyList().size();
+        }
+
+        list.setCount(cnt);
+        list.setList(comments);
+        list.setStatus("OK");
+
+        return list;
+    }
+
 }

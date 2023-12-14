@@ -2,12 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.lec.spring.repository.community.CommentRepository">
 
-    <sql id="SELECT_BASE_USER_OUTER">
+    <sql id="SELECT_BASE_USER_COMMENT">
         SELECT
             c.comment_id,
             c.feed_id,
             c.content,
-            c.user_id,
+            c.parent_id,
+            c.regdate,
             u.user_id,
             u.user_login_id,
             u.user_password,
@@ -24,22 +25,30 @@
         <result column="nickname" property="nickname"/>
     </resultMap>
 
-    <resultMap id="mapOuter" type="com.lec.spring.domain.community.CommentDTO">
+    <resultMap id="mapComment" type="com.lec.spring.domain.community.CommentDTO">
         <result column="comment_id" property="commentId"/>
         <result column="feed_id" property="commentFeedId"/>
-        <result column="user_id" property="commentUserId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="regdate" property="regDate"/>
         <result column="content" property="commentContent"/>
         <association property="user" resultMap="mapUser"/>
     </resultMap>
 
-    <select id="findCommentsByFeedId" resultMap="mapOuter">
-        <include refid="SELECT_BASE_USER_OUTER"/>
-        WHERE feed_id = #{id} AND parent_id is null;
+    <select id="findCommentsByFeedId" resultMap="mapComment">
+        <include refid="SELECT_BASE_USER_COMMENT"/>
+        WHERE feed_id = #{id} AND parent_id is null
+        ORDER BY regdate DESC
     </select>
 
-    <insert id="addComment" flushCache="true" useGeneratedKeys="true" keyColumn="comment_id" keyProperty="commentId">
+    <select id="findRepliesByFeedId" resultMap="mapComment">
+        <include refid="SELECT_BASE_USER_COMMENT"/>
+        WHERE parent_id = #{commentId}
+        ORDER BY regdate DESC
+    </select>
+
+    <insert id="addComment" flushCache="true" useGeneratedKeys="true" keyColumn="comment_id" keyProperty="commentId" parameterType="com.lec.spring.domain.community.CommentDTO">
         INSERT INTO feed_comments (feed_id, user_id, parent_id, content)
-        VALUES (#{commentFeedId}, #{user.userId}, null, #{commentContent})
+        VALUES (#{commentFeedId}, #{user.userId}, #{parentId}, #{commentContent})
     </insert>
 
     <delete id="deleteComment" flushCache="true">

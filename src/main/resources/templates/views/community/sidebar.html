@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+
+<th:block th:fragment="sidebar">
+
+  <div id="layoutSidenav_nav">
+    <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
+      <div class="sb-sidenav-menu">
+        <div class="nav">
+          <!--Home-->
+          <div class="sb-sidenav-menu-heading">Home</div>
+          <a class="nav-link" href="index.html">
+            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+            Dashboard
+          </a>
+
+          <!--Category-->
+          <div class="sb-sidenav-menu-heading">Category</div>
+          <!--Study-->
+          <a aria-controls="collapseLayouts" aria-expanded="false" class="nav-link collapsed"
+             data-bs-target="#collapseLayouts" data-bs-toggle="collapse" href="#">
+            <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
+            Study/Project
+            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+          </a>
+          <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordion"
+               id="collapseLayouts">
+            <nav class="sb-sidenav-menu-nested nav">
+              <a class="nav-link" href="layout-static.html">Menu1</a>
+              <a class="nav-link" href="layout-sidenav-light.html">Menu2</a>
+            </nav>
+          </div>
+
+          <!--QnA-->
+          <a aria-controls="collapseQnA" aria-expanded="false" class="nav-link collapsed"
+             data-bs-target="#collapseQnA" data-bs-toggle="collapse" href="#">
+            <div class="sb-nav-link-icon"><i class="fa-solid fa-comments"></i></div>
+            QnA
+            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+          </a>
+          <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordion"
+               id="collapseQnA">
+            <nav class="sb-sidenav-menu-nested nav">
+              <a class="nav-link" href="layout-static.html">Menu1</a>
+              <a class="nav-link" href="layout-sidenav-light.html">Menu2 </a>
+            </nav>
+          </div>
+
+          <!--Job Info-->
+          <a aria-controls="collapseJobInfo" aria-expanded="false" class="nav-link collapsed"
+             data-bs-target="#collapseJobInfo" data-bs-toggle="collapse" href="#">
+            <div class="sb-nav-link-icon"><i class="fa-solid fa-circle-info"></i></div>
+            Job Info
+            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+          </a>
+          <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordion"
+               id="collapseJobInfo">
+            <nav class="sb-sidenav-menu-nested nav">
+              <a class="nav-link" href="layout-static.html">Menu1</a>
+              <a class="nav-link" href="layout-sidenav-light.html">Menu2 </a>
+            </nav>
+          </div>
+
+          <!--Community-->
+          <a aria-controls="collapseCommu" aria-expanded="false" class="nav-link collapsed"
+             data-bs-target="#collapseCommu"
+             data-bs-toggle="collapse" href="#">
+            <div class="sb-nav-link-icon"><i class="fa-solid fa-users-between-lines"></i></div>
+            Community
+            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+          </a>
+          <div aria-labelledby="headingTwo" class="collapse" data-bs-parent="#sidenavAccordion"
+               id="collapseCommu">
+            <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
+              <a class="nav-link" th:href="@{/community/list}">Main</a>
+              <a class="nav-link" th:href="@{/community/write}">Write</a>
+              <a aria-controls="collapseMyFeed" aria-expanded="false" class="nav-link collapsed"
+                 data-bs-target="#collapseMyFeed" data-bs-toggle="collapse" href="#">
+                My Feed
+                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+              </a>
+              <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordionPages"
+                   id="collapseMyFeed">
+                <nav class="sb-sidenav-menu-nested nav">
+                  <a class="nav-link" th:href="@{/comp/list}">완료글</a>
+                  <a class="nav-link" th:href="@{/temp/list}">임시저장</a>
+                  <a class="nav-link" th:href="@{/trash/list}">휴지통</a>
+                </nav>
+              </div>
+            </nav>
+          </div>
+
+          <div class="sb-sidenav-menu-heading">Account</div>
+          <a class="nav-link" href="charts.html">
+            <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+            Profile
+          </a>
+          <a class="nav-link" href="tables.html">
+            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+            Login
+          </a>
+        </div>
+      </div>
+      <div class="sb-sidenav-footer">
+        <div class="small">Logged in as:</div>
+        undefined<!-- <= 로그인시 해당 유정의 닉네임으로 변경, 로그아웃시에는 undefined-->
+      </div>
+    </nav>
+  </div>
+
+</th:block>
+
+
+</html>

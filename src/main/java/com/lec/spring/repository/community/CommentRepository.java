@@ -15,6 +15,8 @@ public interface CommentRepository {
     // 댓글 삭제
     int deleteComment(Long commentId);
 
+    List<CommentDTO> findRepliesByFeedId(Long commentId);
+
 
     // 댓글 수정?? => 기획에는 안 넣긴 했음
 }

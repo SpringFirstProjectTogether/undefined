@@ -8,12 +8,13 @@
     <meta content="" name="description"/>
     <meta content="" name="author"/>
     <title>Community Main Page</title>
-    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet"/>
+<!--    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet"/>-->
     <link href="/css/styles.css" rel="stylesheet"/>
+
     <script crossorigin="anonymous" src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/sketchy/bootstrap.min.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script th:src="@{/js/communityMainPage.js}"></script>
+
     <style>
         .scrollbar::-webkit-scrollbar {
             width: 10px;
@@ -35,6 +36,63 @@
 
         button, .cursor-pointer {
             cursor: pointer;
+        }
+
+        * {box-sizing:border-box}
+
+        /* Slideshow container */
+        .slideshow-container {
+            max-width: 1000px;
+            position: relative;
+            margin: auto;
+        }
+
+        /* Hide the images by default */
+        .mySlides {
+            display: none;
+        }
+
+        /* Next & previous buttons */
+        .prev, .next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            margin-top: -22px;
+            padding: 16px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            transition: 0.6s ease;
+            border-radius: 0 3px 3px 0;
+            user-select: none;
+        }
+
+        /* Position the "next button" to the right */
+        .next {
+            right: 0;
+            border-radius: 3px 0 0 3px;
+        }
+
+        /* On hover, add a black background color with a little bit see-through */
+        .prev:hover, .next:hover {
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        /* The dots/bullets/indicators */
+        .dot {
+            cursor: pointer;
+            height: 15px;
+            width: 15px;
+            margin: 0 2px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.6s ease;
+        }
+
+        .active, .dot:hover {
+            background-color: #717171;
         }
 
     </style>
@@ -65,113 +123,11 @@
     </ul>
 </nav>
 <div id="layoutSidenav">
-    <div id="layoutSidenav_nav">
-        <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
-            <div class="sb-sidenav-menu">
-                <div class="nav">
-                    <!--Home-->
-                    <div class="sb-sidenav-menu-heading">Home</div>
-                    <a class="nav-link" href="index.html">
-                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                        Dashboard
-                    </a>
+    <!-- sidebar -->
+    <th:block th:insert="~{community/sidebar::sidebar}"></th:block>
 
-                    <!--Category-->
-                    <div class="sb-sidenav-menu-heading">Category</div>
-                    <!--Study-->
-                    <a aria-controls="collapseLayouts" aria-expanded="false" class="nav-link collapsed"
-                       data-bs-target="#collapseLayouts" data-bs-toggle="collapse" href="#">
-                        <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-                        Study/Project
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
-                    <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordion"
-                         id="collapseLayouts">
-                        <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="layout-static.html">Menu1</a>
-                            <a class="nav-link" href="layout-sidenav-light.html">Menu2</a>
-                        </nav>
-                    </div>
-
-                    <!--QnA-->
-                    <a aria-controls="collapseQnA" aria-expanded="false" class="nav-link collapsed"
-                       data-bs-target="#collapseQnA" data-bs-toggle="collapse" href="#">
-                        <div class="sb-nav-link-icon"><i class="fa-solid fa-comments"></i></div>
-                        QnA
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
-                    <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordion"
-                         id="collapseQnA">
-                        <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="layout-static.html">Menu1</a>
-                            <a class="nav-link" href="layout-sidenav-light.html">Menu2 </a>
-                        </nav>
-                    </div>
-
-                    <!--Job Info-->
-                    <a aria-controls="collapseJobInfo" aria-expanded="false" class="nav-link collapsed"
-                       data-bs-target="#collapseJobInfo" data-bs-toggle="collapse" href="#">
-                        <div class="sb-nav-link-icon"><i class="fa-solid fa-circle-info"></i></div>
-                        Job Info
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
-                    <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordion"
-                         id="collapseJobInfo">
-                        <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="layout-static.html">Menu1</a>
-                            <a class="nav-link" href="layout-sidenav-light.html">Menu2 </a>
-                        </nav>
-                    </div>
-
-                    <!--Community-->
-                    <a aria-controls="collapseCommu" aria-expanded="false" class="nav-link collapsed"
-                       data-bs-target="#collapseCommu"
-                       data-bs-toggle="collapse" href="#">
-                        <div class="sb-nav-link-icon"><i class="fa-solid fa-users-between-lines"></i></div>
-                        Community
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
-                    <div aria-labelledby="headingTwo" class="collapse" data-bs-parent="#sidenavAccordion"
-                         id="collapseCommu">
-                        <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
-                            <a class="nav-link" th:href="@{/community/list}">Main</a>
-                            <a class="nav-link" th:href="@{/community/write}">Write</a>
-                            <a aria-controls="collapseMyFeed" aria-expanded="false" class="nav-link collapsed"
-                               data-bs-target="#collapseMyFeed" data-bs-toggle="collapse" href="#">
-                                My Feed
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>
-                            <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordionPages"
-                                 id="collapseMyFeed">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" th:href="@{/comp/list}">완료글</a>
-                                    <a class="nav-link" th:href="@{/temp/list}">임시저장</a>
-                                    <a class="nav-link" th:href="@{/trash/list}">휴지통</a>
-                                </nav>
-                            </div>
-                        </nav>
-                    </div>
-
-                    <div class="sb-sidenav-menu-heading">Account</div>
-                    <a class="nav-link" href="charts.html">
-                        <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                        Profile
-                    </a>
-                    <a class="nav-link" href="tables.html">
-                        <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                        Login
-                    </a>
-                </div>
-            </div>
-            <div class="sb-sidenav-footer">
-                <div class="small">Logged in as:</div>
-                undefined<!-- <= 로그인시 해당 유정의 닉네임으로 변경, 로그아웃시에는 undefined-->
-            </div>
-        </nav>
-    </div>
     <div id="layoutSidenav_content">
         <main>
-
             <div class="container-fluid px-4">
                 <div style="height: 30px;"></div>
 
@@ -240,34 +196,28 @@
 
                             <button class="btn btn-link text-start ps-0 col-3" th:id="${'more'+feed.feedId}"
                                     th:if="${feed.shortContent}" type="button">
-                                <p class="card-text text-muted ms-3">more...</p>
+                                <span class="card-text text-muted ms-3">more...</span>
                             </button>
 
+                            <!-- Slideshow container -->
+                            <div class="slideshow-container">
 
-                            <div class="container" style="padding: 0 25px;">
-                                <div class="row">
-                                    <div class="col-6"
-                                         style="height: 100px; border: 1px solid; text-align: center; line-height: 100px;">
-                                        photo1
-                                    </div>
-                                    <div class="col-6"
-                                         style="height: 100px; border: 1px solid; text-align: center; line-height: 100px;">
-                                        photo2
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-6"
-                                         style="height: 100px; border: 1px solid; text-align: center; line-height: 100px;">
-                                        photo3
-                                    </div>
-                                    <div class="col-6"
-                                         style="height: 100px; border: 1px solid; text-align: center; line-height: 100px;">
-                                        +4
-                                    </div>
+                                <!-- Full-width images with number and caption text -->
+                                <div class="mySlides fade" th:each="photo: ${feed.fileList}" th:if="${photo.image}">
+                                    <img th:src="@{'/upload/' + ${photo.filename}}" style="width:100%">
                                 </div>
 
+                                <!-- Next and previous buttons -->
+                                <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+                                <a class="next" onclick="plusSlides(1)">&#10095;</a>
                             </div>
+                            <br>
 
+                            <!-- The dots/circles -->
+                            <div style="text-align:center" th:each="photo: ${feed.fileList}" th:if="${photo.image}">
+                                <span class="dot" th:onclick="currentSlide([[${photoStat.index}]])"></span>
+                            </div>
+                            <!--Image List-->
 
                             <div class="card-body container">
                                 <p class="tagList" th:text="${feed.tagList}">
@@ -288,10 +238,12 @@
                                                          th:text="${feed.likeCnt}">0</span>
                                         </button>
 
-                                        <button aria-expanded="true" class="btn btn-link col" data-bs-toggle="collapse"
+                                        <button aria-expanded="true" class="btn btn-link col"
+                                                data-bs-toggle="collapse"
                                                 th:aria-controls="${'#Collapse' + feed.feedId}"
                                                 th:data-bs-target="${'#Collapse' + feed.feedId}"
-                                                type="button">
+                                                type="button"
+                                                th:id="${'cmtBtn' + feed.feedId}">
                                             <i class="fa-regular fa-comment fa-sm"></i>&nbsp;comment
                                         </button>
                                         <!-- <button type="button" class="btn btn-link col"><i class="fa-regular fa-comment fa-sm"></i>&nbsp;comment</button> -->
@@ -320,101 +272,23 @@
                                 <div class="accordion-collapse collapse hidden" th:id="${'Collapse' + feed.feedId}">
                                     <hr>
                                     <div class="accordion-body overflow-auto scrollbar"
-                                         style="height: auto; max-height: 200px;" th:if="${feed.comments}">
-                                        <div th:each="comment : ${feed.comments}">
-                                            <div>
-                                                <span style="font-size: 0.9em" th:text="${comment.user.nickname}">Nickname</span><span
-                                                    class="text-danger cursor-pointer"
-                                                    th:id="${'commentDelBtn' + comment.commentId}">&nbsp;&nbsp;X</span>
-                                                <br>
-                                                <span style="font-size: 0.8em" th:text="${comment.commentContent}">comment</span>
-                                                <form class="visually-hidden" method="post"
-                                                      th:action="@{/comment/delete}"
-                                                      th:id="${'commentDel' + comment.commentId}">
-                                                    <input name="commentId" th:value="${comment.commentId}"
-                                                           type="hidden"/>
-                                                </form>
-
-                                            </div>
-                                            <div class="ms-4"><!-- 대댓글 -->
-                                                <div th:each="reply: ${comment.replyDTOList}">
-                                                    <div>
-                                                        <span style="font-size: 0.9em" th:text="${reply.user.nickname}">Nickname</span><span
-                                                            class="text-danger cursor-pointer"
-                                                            th:id="${'replyDelBtn' + reply.replyId}">&nbsp;&nbsp;X</span>
-                                                        <br>
-                                                        <span style="font-size: 0.8em" th:text="${reply.replyContent}">comment</span>
-                                                        <form class="visually-hidden" method="post"
-                                                              th:action="@{/reply/delete}"
-                                                              th:id="${'replyDel' + reply.replyId}">
-                                                            <input name="replyId" th:value="${reply.replyId}"
-                                                                   type="hidden"/>
-                                                        </form>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="text-muted mt-0 cursor-pointer" style="font-size: 0.8em"
-                                                 th:id="${'reply' + comment.commentId}"
-                                                 th:if="${comment}">답글달기
-                                            </div>
-                                            <form class="visually-hidden" method="post" th:action="@{/reply/write}"
-                                                  th:id="${'replyFrm' + comment.commentId}">
-                                                <input name="parentId" th:value="${comment.commentId}" type="hidden"/>
-                                                <input name="feedId" th:value="${feed.feedId}" type="hidden"/>
-                                                <input name="content" th:id="${'replyContent' + comment.commentId}"
-                                                       type="hidden"/>
-                                                <script th:inline="javascript">
-                                                    document.querySelector(`#reply[[${comment.commentId}]]`).addEventListener('click', () => {
-                                                        const re = document.getElementById(`isReply[[${feed.feedId}]]`);
-                                                        re.classList.remove('visually-hidden');
-                                                        const comment = [[${comment.commentContent}]];
-                                                        document.getElementById(`showRoute[[${feed.feedId}]]`).innerHTML = `[[${comment.user.nickname}]] : ${comment.substr(0, 10)}...에 대한 답글 작성 중...`;
-                                                        document.getElementById(`placehold[[${feed.feedId}]]`).placeholder = `답글을 작성하시오.`;
-
-                                                        document.getElementById(`changeComment[[${feed.feedId}]]`).addEventListener('click', () => {
-                                                            re.classList.add('visually-hidden');
-                                                            document.getElementById(`placehold[[${feed.feedId}]]`).placeholder = `댓글 작성하시오.`;
-                                                        })
-
-                                                        document.querySelector(`#addComment[[${feed.feedId}]]`).addEventListener('click', (e) => {
-                                                            if (!document.getElementById(`isReply[[${feed.feedId}]]`).classList.contains('visually-hidden')) { // comment
-                                                                document.getElementById(`replyContent[[${comment.commentId}]]`).value = document.getElementById(`placehold[[${feed.feedId}]]`).value;
-                                                                document.getElementById(`replyFrm[[${comment.commentId}]]`).submit();
-                                                            }
-                                                        })
-
-                                                    })
-                                                </script>
-                                            </form>
-                                            <br>
-                                        </div>
-
+                                         style="height: auto; max-height: 200px;">
+                                        <th:block th:insert="~{community/comment::comment}"></th:block>
                                     </div>
                                     <br>
-                                    <form method="post" th:action="@{/comment/write}"
-                                          th:id="${'commentFrm' + feed.feedId}">
-                                        <input name="feedId" th:value="${feed.feedId}" type="hidden"/>
-
-                                        <div class="row visually-hidden" th:id="${'isReply' + feed.feedId}">
-                                            <div class="col-10" th:id="${'showRoute' + feed.feedId}"></div>
-                                            <div class="col-2"><i class="fa-solid fa-xmark fa-xs cursor-pointer"
-                                                                  th:id="${'changeComment' + feed.feedId}"></i></div>
+                                    <div class="d-flex visually-hidden" th:id="${'isReply' + feed.feedId}">
+                                        <div class="col-11"></div>
+                                        <div class="col-1 text-secondary cursor-pointer text-center"
+                                             th:id="${'cancelReply' + feed.feedId}"><i class="fa-solid fa-xmark"></i>
                                         </div>
-
-                                        <textarea class="col-12" name="content" placeholder="댓글을 작성하시오."
-                                                  rows=2
-                                                  th:id="${'placehold' + feed.feedId}"></textarea>
-                                        <div>
-                                            <span class="text-primary cursor-pointer" style="font-size: 0.8em;"
-                                                  th:id="${'addComment' + feed.feedId }">등록
-                                            </span>
-                                            <span class="text-danger ms-1 cursor-pointer" style="font-size: 0.8em;"
-                                                  th:id="${'cancelComment' + feed.feedId }">지우기
-                                            </span>
-                                        </div>
-                                    </form>
-
+                                    </div>
+                                    <div class="input-group mt-1">
+                                        <input type="text" class="form-control" placeholder="댓글을 입력하시오."
+                                               th:id="${'input_comment' + feed.feedId}">
+                                        <button type="button" class="btn btn-primary"
+                                                th:id="${'btn_comment' + feed.feedId}">작성
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -442,11 +316,8 @@
 </div>
 <script crossorigin="anonymous"
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script th:src="@{/js/communityMainPage.js}"></script>
 </body>
 
 </html>
-
-
-
-
-

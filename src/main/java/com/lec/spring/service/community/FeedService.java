@@ -1,15 +1,15 @@
 package com.lec.spring.service.community;
 
 import com.lec.spring.domain.community.FeedDTO;
-import com.lec.spring.domain.community.ReplyDTO;
-import com.lec.spring.domain.community.CommentDTO;
 import org.springframework.ui.Model;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 public interface FeedService {
 
-    int writeFeed(FeedDTO feed);
+    int writeFeed(FeedDTO feed, List<MultipartFile> files);
     int deleteFeed(Long feedId);
     int updateFeed(FeedDTO feed);
     int trashFeed(Long feedId);
